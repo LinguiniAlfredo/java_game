@@ -24,7 +24,7 @@ public class Entity {
         this.target_orientation = orientation;
         this.scale              = scale;
         this.model              = new Model(filename, texture);
-        this.shader             = new Shader("shaders/lighting.vert", "shaders/lighting.frag");
+        this.shader             = new Shader("shaders/simple.vert", "shaders/simple.frag");
 
         Vector3f dimensions = get_dimensions();
         this.collision      = new Collision(position, dimensions.x, dimensions.y, dimensions.z);

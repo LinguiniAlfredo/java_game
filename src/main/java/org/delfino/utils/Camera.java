@@ -79,15 +79,11 @@ public class Camera {
     }
 
     public Matrix4f get_view_matrix() {
-        Matrix4f view = new Matrix4f();
-        view.setLookAt(this.position, new Vector3f(this.position).add(this.front), this.up);
-        return view;
+        return new Matrix4f().setLookAt(this.position, new Vector3f(this.position).add(this.front), this.up);
     }
 
     public Matrix4f get_perspective_matrix() {
-        Matrix4f proj = new Matrix4f();
-        proj.setPerspective(frustrum.fov, frustrum.aspect, frustrum.near, frustrum.far);
-        return proj;
+        return new Matrix4f().setPerspective(frustrum.fov, frustrum.aspect, frustrum.near, frustrum.far);
     }
 
     public void process_keyboard() {

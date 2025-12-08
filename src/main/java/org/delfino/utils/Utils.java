@@ -33,42 +33,46 @@ public class Utils {
         fb.put(m.m02()).put(m.m12()).put(m.m22()).put(m.m32());
         fb.put(m.m03()).put(m.m13()).put(m.m23()).put(m.m33());
 
-        fb.rewind();
+        fb.flip();
         return fb;
     }
 
     public static FloatBuffer vertices_to_fb(ArrayList<Vertex> vertices) {
-        FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.size() * Vertex.bytes);
+        FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.size() * 8);
         for (Vertex v : vertices) {
             fb.put(v.position.x).put(v.position.y).put(v.position.z);
             fb.put(v.normal.x).put(v.normal.y).put(v.normal.z);
             fb.put(v.tex_coords.x).put(v.tex_coords.y);
         }
+        fb.flip();
         return fb;
     }
 
     public static FloatBuffer vertices_3f_to_fb(ArrayList<Vector3f> vertices) {
-        FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.size() * Vertex.bytes);
+        FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.size() * 3);
         for (Vector3f v : vertices) {
             fb.put(v.x).put(v.y).put(v.z);
         }
+        fb.flip();
         return fb;
     }
 
     public static FloatBuffer float_arr_to_fb(float[] vertices) {
-        FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.length * Float.BYTES);
+        FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.length);
         for (float v : vertices) {
             fb.put(v);
         }
+        fb.flip();
         return fb;
     }
 
 
     public static IntBuffer indices_to_ib(ArrayList<Integer> indices) {
-        IntBuffer ib = BufferUtils.createIntBuffer(indices.size() * 24);
+        IntBuffer ib = BufferUtils.createIntBuffer(indices.size());
         for (Integer i : indices) {
             ib.put(i);
         }
+        ib.flip();
         return ib;
     }
 
