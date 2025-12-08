@@ -1,5 +1,6 @@
 package org.delfino;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.delfino.entities.Cube;
 import org.delfino.entities.Entity;
 import org.delfino.entities.LightCube;
@@ -250,7 +251,9 @@ public class Game {
     private void init_glfw() {
         // Wayland is not fully supported in GLFW
         // this will force using X11 on wayland (XWayland)
-        glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+        if (SystemUtils.IS_OS_LINUX) {
+            glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+        }
 
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
