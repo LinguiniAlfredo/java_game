@@ -43,26 +43,18 @@ public class Shader {
         glAttachShader(this.id, f);
         glLinkProgram(this.id);
 
-        int success = GL20.glGetShaderi(this.id, GL20.GL_COMPILE_STATUS);
-        if (success == GL11.GL_FALSE) {
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                int logLength = GL20.glGetShaderi(this.id, GL20.GL_INFO_LOG_LENGTH);
-                if (logLength > 1) {
-                    String infoLog = GL20.glGetShaderInfoLog(this.id, logLength);
-                    System.err.println("shader compilation error\n" + infoLog);
-                }
-            }
+        if (glGetShaderi(v, GL_COMPILE_STATUS) == GL_FALSE) {
+            System.out.println("ERROR: Vertex Shader compilation failed!");
+            System.out.println(glGetShaderInfoLog(v));
+        }
+        if (glGetShaderi(f, GL_COMPILE_STATUS) == GL_FALSE) {
+            System.out.println("ERROR: Fragment Shader compilation failed!");
+            System.out.println(glGetShaderInfoLog(f));
         }
 
-        success = GL20.glGetProgrami(this.id, GL20.GL_LINK_STATUS);
-        if (success == GL11.GL_FALSE) {
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                int logLength = GL20.glGetProgrami(this.id, GL20.GL_INFO_LOG_LENGTH);
-                if (logLength > 1) {
-                    String infoLog = GL20.glGetProgramInfoLog(this.id, logLength);
-                    System.err.println("Shader program linking error\n" + infoLog);
-                }
-            }
+        if (glGetProgrami(this.id, GL_LINK_STATUS) == GL_FALSE) {
+            System.out.println("ERROR: Shader linking failed!");
+            System.out.println(glGetShaderInfoLog(this.id));
         }
 
         glDeleteShader(v);

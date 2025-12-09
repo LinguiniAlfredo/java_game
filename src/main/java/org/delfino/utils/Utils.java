@@ -27,12 +27,7 @@ public class Utils {
 
     public static FloatBuffer mat4_to_fb(Matrix4f m) {
         FloatBuffer fb = BufferUtils.createFloatBuffer(16);
-
-        fb.put(m.m00()).put(m.m10()).put(m.m20()).put(m.m30());
-        fb.put(m.m01()).put(m.m11()).put(m.m21()).put(m.m31());
-        fb.put(m.m02()).put(m.m12()).put(m.m22()).put(m.m32());
-        fb.put(m.m03()).put(m.m13()).put(m.m23()).put(m.m33());
-
+        m.get(fb);
         fb.flip();
         return fb;
     }

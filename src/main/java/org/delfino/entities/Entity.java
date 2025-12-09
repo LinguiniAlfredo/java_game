@@ -26,14 +26,14 @@ public class Entity {
         this.model              = new Model(filename, texture);
         this.shader             = new Shader("shaders/simple.vert", "shaders/simple.frag");
 
-        Vector3f dimensions = get_dimensions();
-        this.collision      = new Collision(position, dimensions.x, dimensions.y, dimensions.z);
+//        Vector3f dimensions = get_dimensions();
+//        this.collision      = new Collision(position, dimensions.x, dimensions.y, dimensions.z);
     }
 
     public void delete() {
         this.shader.delete();
         this.model.delete();
-        this.collision.delete();
+//        this.collision.delete();
     }
 
     public void update(double delta_time) {
@@ -52,35 +52,35 @@ public class Entity {
         this.model.render_shadow_map(shadow_map_shader, this.position, this.orientation, this.scale);
     }
 
-    private Vector3f get_dimensions() {
-        float min_x = 0.f, max_x = 0.f;
-        float min_y = 0.f, max_y = 0.f;
-        float min_z = 0.f, max_z = 0.f;
-
-        for (int i = 0; i < this.model.meshes.size(); i++) {
-            Mesh mesh = this.model.meshes.get(i);
-            for (int j = 0; j < mesh.vertices.size(); j++) {
-                Vertex vertex = mesh.vertices.get(j);
-                if (vertex.position.x < min_x) {
-                    min_x = vertex.position.x;
-                }
-                if (vertex.position.x < min_y) {
-                    min_y = vertex.position.y;
-                }
-                if (vertex.position.z < min_z) {
-                    min_z = vertex.position.z;
-                }
-                if (vertex.position.x > max_x) {
-                    max_x = vertex.position.x;
-                }
-                if (vertex.position.y > max_y) {
-                    max_y = vertex.position.y;
-                }
-                if (vertex.position.z > max_z) {
-                    max_z = vertex.position.z;
-                }
-            }
-        }
-        return new Vector3f(max_x - min_x, max_y - min_y, max_z - min_z);
-    }
+//////    private Vector3f get_dimensions() {
+//////        float min_x = 0.f, max_x = 0.f;
+//////        float min_y = 0.f, max_y = 0.f;
+//////        float min_z = 0.f, max_z = 0.f;
+//////
+//////        for (int i = 0; i < this.model.meshes.size(); i++) {
+//////            Mesh mesh = this.model.meshes.get(i);
+//////            for (int j = 0; j < mesh.vertices.limit(); j++) {
+//////                Vertex vertex = mesh.vertices.get(i);
+//////                if (vertex.position.x < min_x) {
+//////                    min_x = vertex.position.x;
+//////                }
+//////                if (vertex.position.x < min_y) {
+//////                    min_y = vertex.position.y;
+//////                }
+//////                if (vertex.position.z < min_z) {
+//////                    min_z = vertex.position.z;
+//////                }
+//////                if (vertex.position.x > max_x) {
+//////                    max_x = vertex.position.x;
+//////                }
+//////                if (vertex.position.y > max_y) {
+//////                    max_y = vertex.position.y;
+//////                }
+//////                if (vertex.position.z > max_z) {
+//////                    max_z = vertex.position.z;
+//////                }
+//////            }
+//////        }
+////        return new Vector3f(max_x - min_x, max_y - min_y, max_z - min_z);
+//    }
 }

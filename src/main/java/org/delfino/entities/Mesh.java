@@ -12,17 +12,19 @@ import org.joml.Vector3f;
 
 import static org.lwjgl.opengl.GL30.*;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 public class Mesh {
     int                VAO, VBO, EBO;
-    ArrayList<Vertex>  vertices;
-    ArrayList<Integer> indices;
+    FloatBuffer vertices;
+    IntBuffer indices;
     ArrayList<Texture> textures;
 
     public Mesh(ArrayList<Vertex> vertices, ArrayList<Integer> indices, ArrayList<Texture> textures) {
-        this.vertices = vertices;
-        this.indices  = indices;
+        this.vertices = Utils.vertices_to_fb(vertices);
+        this.indices  = Utils.indices_to_ib(indices);
         this.textures = textures;
 
         init();
@@ -42,7 +44,7 @@ public class Mesh {
         shader.set_mat4("projection", mat_proj);
 
         glBindVertexArray(this.VAO);
-        glDrawElements(GL_TRIANGLES, this.indices.size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, this.indices.limit(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 
@@ -55,7 +57,7 @@ public class Mesh {
         shadow_map_shader.set_mat4("model", mat_model);
 
         glBindVertexArray(this.VAO);
-        glDrawElements(GL_TRIANGLES, this.indices.size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, this.indices.limit(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 
@@ -67,14 +69,14 @@ public class Mesh {
         glBindVertexArray(this.VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, this.VBO);
-        glBufferData(GL_ARRAY_BUFFER, Utils.vertices_to_fb(this.vertices), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, this.vertices, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this.EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, Utils.indices_to_ib(this.indices), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, this.indices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, Float.BYTES * 8, Utils.vertices_to_fb(this.vertices));
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, Float.BYTES * 8, Utils.vertices_to_fb(this.vertices).position(3));
-        glVertexAttribPointer(2, 3, GL_FLOAT, false, Float.BYTES * 8, Utils.vertices_to_fb(this.vertices).position(6));
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, Float.BYTES * 8, this.vertices);
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, Float.BYTES * 8, this.vertices.position(3));
+        glVertexAttribPointer(2, 3, GL_FLOAT, false, Float.BYTES * 8, this.vertices.position(6));
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
