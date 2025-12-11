@@ -37,6 +37,9 @@ public class Camera {
     public float mouse_sensitivity;
     public float zoom;
 
+    public double prev_mouse_x = 0;
+    public double prev_mouse_y = 0;
+
     public Frustrum frustrum;
 
     public Camera(Vector3f position) {
@@ -79,7 +82,7 @@ public class Camera {
     }
 
     public Matrix4f get_view_matrix() {
-        return new Matrix4f().setLookAt(this.position, new Vector3f(this.position).add(this.front), this.up);
+        return new Matrix4f().lookAt(this.position, new Vector3f(this.position).add(this.front), this.up);
     }
 
     public Matrix4f get_perspective_matrix() {
@@ -136,9 +139,16 @@ public class Camera {
         }
     }
 
-    public void process_mouse(double x_offset, double y_offset, double delta_time) {
+    public void process_mouse(double mouse_x, double mouse_y, double delta_time) {
+        double x_offset, y_offset;
+        x_offset = mouse_x - prev_mouse_x;
+        y_offset = -(mouse_y - prev_mouse_y);
+        prev_mouse_x = mouse_x;
+        prev_mouse_y = mouse_y;
+
         x_offset *= this.mouse_sensitivity * delta_time;
         y_offset *= this.mouse_sensitivity * delta_time;
+        System.out.println(x_offset + ", " + y_offset);
 
         this.yaw   += x_offset;
         this.pitch += y_offset;
@@ -156,12 +166,10 @@ public class Camera {
         f.x = (float) (Math.cos(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
         f.y = (float) (Math.sin(Math.toRadians(this.pitch)));
         f.z = (float) (Math.sin(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
-        this.front = new Vector3f(f);
-        this.front.normalize();
-        this.right = new Vector3f(this.front).cross(this.world_up);
-        this.right.normalize();
-        this.up    = new Vector3f(this.right).cross(this.front);
-        this.up.normalize();
+
+        this.front = new Vector3f(f).normalize();
+        this.right = new Vector3f(this.front).cross(this.world_up).normalize();
+        this.up    = new Vector3f(this.right).cross(this.front).normalize();
 
         this.trajectory.add(new Vector3f(right).mul(input_vector.x, new Vector3f()));
         this.trajectory.add(new Vector3f(up).mul(input_vector.y, new Vector3f()));

@@ -33,7 +33,8 @@ public class Game {
         init_context();
         init_glfw();
 
-        Context.light_cube = new LightCube(new Vector3f(0.f, 0.f, 1.f));
+        Context.light_cube = new LightCube(new Vector3f(0.f, 0.f, 0.f));
+        Context.camera = new Camera(new Vector3f(0.0f, 0.0f, 20.0f));
 
         init_level();
         game_loop();
@@ -138,6 +139,10 @@ public class Game {
             destroy_level();
             init_level();
         }
+        Context.camera.process_keyboard();
+        if (Context.gamemode != PAUSED) {
+            Context.camera.process_mouse(mouse_x[0], mouse_y[0], delta_time);
+        }
 
     }
 
@@ -145,6 +150,7 @@ public class Game {
     }
 
     private void update(double delta_time) {
+        Context.camera.update(delta_time);
     }
 
     private void render() {
@@ -203,6 +209,9 @@ public class Game {
         glfwShowWindow(Context.window);
 
         GL.createCapabilities();
+        glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glEnable(GL_DEPTH_TEST);
+        glViewport(0, 0, Context.screen_width, Context.screen_height);
     }
 
     private void game_loop() {
