@@ -90,6 +90,9 @@ public class Camera {
     }
 
     public void process_keyboard() {
+        this.input_vector = new Vector3f(0.f);
+        this.movement_speed = SPEED;
+
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS) {
             this.input_vector.z = 1;
         }
@@ -112,30 +115,9 @@ public class Camera {
             this.movement_speed = SPEED * 4;
         }
 
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_RELEASE) {
-            this.input_vector.z = 0;
-        }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_A) == GLFW.GLFW_RELEASE) {
-            this.input_vector.x = 0;
-        }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_S) == GLFW.GLFW_RELEASE) {
-            this.input_vector.z = 0;
-        }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_RELEASE) {
-            this.input_vector.x = 0;
-        }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_Q) == GLFW.GLFW_RELEASE) {
-            this.input_vector.y = 0;
-        }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_E) == GLFW.GLFW_RELEASE) {
-            this.input_vector.y = 0;
-        }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS) {
-            this.movement_speed = SPEED;
-        }
-
         if (this.input_vector.x != 0 || this.input_vector.y != 0 || this.input_vector.z != 0) {
             this.input_vector.normalize();
+            System.out.println(this.input_vector);
         }
     }
 
@@ -148,7 +130,6 @@ public class Camera {
 
         x_offset *= this.mouse_sensitivity * delta_time;
         y_offset *= this.mouse_sensitivity * delta_time;
-        System.out.println(x_offset + ", " + y_offset);
 
         this.yaw   += x_offset;
         this.pitch += y_offset;
@@ -171,6 +152,7 @@ public class Camera {
         this.right = new Vector3f(this.front).cross(this.world_up).normalize();
         this.up    = new Vector3f(this.right).cross(this.front).normalize();
 
+//        this.trajectory = new Vector3f(0.f);
         this.trajectory.add(new Vector3f(right).mul(input_vector.x, new Vector3f()));
         this.trajectory.add(new Vector3f(up).mul(input_vector.y, new Vector3f()));
         this.trajectory.add(new Vector3f(front).mul(input_vector.z, new Vector3f()));
