@@ -152,7 +152,7 @@ public class Camera {
         this.right = new Vector3f(this.front).cross(this.world_up).normalize();
         this.up    = new Vector3f(this.right).cross(this.front).normalize();
 
-//        this.trajectory = new Vector3f(0.f);
+        this.trajectory = new Vector3f(0.f);
         this.trajectory.add(new Vector3f(right).mul(input_vector.x, new Vector3f()));
         this.trajectory.add(new Vector3f(up).mul(input_vector.y, new Vector3f()));
         this.trajectory.add(new Vector3f(front).mul(input_vector.z, new Vector3f()));
