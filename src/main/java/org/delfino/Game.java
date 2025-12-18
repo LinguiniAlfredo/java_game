@@ -33,10 +33,12 @@ public class Game {
         init_context();
         init_glfw();
 
-        Context.light_cube = new LightCube(new Vector3f(0.f, 0.f, 0.f));
+        Context.light_cube = new LightCube(new Vector3f(0.f, 5.f, 0.f));
         Context.camera = new Camera(new Vector3f(0.0f, 0.0f, 20.0f));
+        Context.shadow_map = new Shadowmap();
+        Context.world_blocks.add(new Cube(new Vector3f(0.f)));
 
-        init_level();
+//        init_level();
         game_loop();
         close_app();
     }
@@ -53,6 +55,10 @@ public class Game {
 //
     private void close_app() {
         Context.light_cube.delete();
+        for (Entity world_block : Context.world_blocks) {
+            world_block.delete();
+        }
+        Context.shadow_map.delete();
 
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(Context.window);
@@ -99,9 +105,14 @@ public class Game {
     }
 
     private void destroy_level() {
+        for (Entity world_block : Context.world_blocks) {
+            world_block.delete();
+        }
+        Context.light_cube.delete();
     }
 
     private void init_level() {
+
     }
 
     private void handle_events(double delta_time) {
@@ -116,7 +127,7 @@ public class Game {
         }
 
         if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_TAB) == GLFW.GLFW_PRESS) {
-            toggle_paused();
+//            toggle_paused();
         }
 
         if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F1) == GLFW.GLFW_PRESS) {
@@ -156,7 +167,26 @@ public class Game {
     private void render() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Context.shadow_map.do_pass();
+
+        for (Entity world_block : Context.world_blocks) {
+            world_block.render();
+            if (Context.show_collisions) {
+                world_block.render_collider();
+            }
+        }
+
         Context.light_cube.render();
+        for (Entity entity : Context.entities) {
+            entity.render();
+            if (Context.show_collisions) {
+                entity.render_collider();
+            }
+        }
+
+        if (Context.show_shadow_map) {
+            Context.shadow_map.render_depth_quad();
+        }
         glfwSwapBuffers(Context.window);
     }
 

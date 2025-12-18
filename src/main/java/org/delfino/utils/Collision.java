@@ -4,6 +4,8 @@ import org.delfino.Context;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL30.*;
@@ -85,8 +87,7 @@ public class Collision {
     }
 
     public void render() {
-        Matrix4f model = new Matrix4f();
-        model.setTranslation(this.position);
+        Matrix4f model = new Matrix4f().translate(this.position);
 
         Matrix4f view = Context.camera.get_view_matrix();
         Matrix4f proj = Context.camera.get_perspective_matrix();
@@ -114,7 +115,7 @@ public class Collision {
         glBindBuffer(GL_ARRAY_BUFFER, this.VBO);
         glBufferData(GL_ARRAY_BUFFER, Utils.vertices_3f_to_fb(this.vertices), GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, Float.BYTES * 3, Utils.vertices_3f_to_fb(this.vertices));
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, Float.BYTES * 3, 0);
         glBindVertexArray(0);
     }
 

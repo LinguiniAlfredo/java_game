@@ -38,12 +38,13 @@ public class Shadowmap {
     }
 
     public void do_pass() {
-        Matrix4f mat_proj = new Matrix4f();
-        mat_proj.setOrtho(-20.f, 20.f, -20.f, 20.f, this.near_plane, this.far_plane);
+        Matrix4f mat_proj = new Matrix4f()
+                .setOrtho(-20.f, 20.f, -20.f, 20.f, this.near_plane, this.far_plane);
 
-        Matrix4f mat_view = new Matrix4f();
-        mat_view.setLookAt(new Vector3f(-20.f, 20.f, 0.f), new Vector3f(0.f, 0.f, 0.f), new Vector3f(0.f, 1.f, 0.f));
-        this.light_space_matrix = mat_proj.mul(mat_view);
+        Matrix4f mat_view = new Matrix4f()
+                .setLookAt(new Vector3f(-20.f, 20.f, 0.f), new Vector3f(0.f, 0.f, 0.f), new Vector3f(0.f, 1.f, 0.f));
+
+        this.light_space_matrix = new Matrix4f(mat_proj).mul(mat_view);
 
         this.shader.use();
         this.shader.set_mat4("light_space_matrix", this.light_space_matrix);
@@ -105,9 +106,9 @@ public class Shadowmap {
         glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
         glBufferData(GL_ARRAY_BUFFER, Utils.float_arr_to_fb(quad_vertices), GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * Float.BYTES, Utils.float_arr_to_fb(quad_vertices));
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * Float.BYTES, 0);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * Float.BYTES, Utils.float_arr_to_fb(quad_vertices).position(3));
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * Float.BYTES, 3);
 
         glBindVertexArray(quad_vao);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

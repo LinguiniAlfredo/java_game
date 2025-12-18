@@ -122,23 +122,22 @@ public class Model {
             vector.x = mesh.mVertices().get(i).x();
             vector.y = mesh.mVertices().get(i).y();
             vector.z = mesh.mVertices().get(i).z();
-            vertex.position = vector;
+            vertex.position = new Vector3f(vector);
 
             if (Objects.requireNonNull(mesh.mNormals()).hasRemaining()) {
                 vector.x = Objects.requireNonNull(mesh.mNormals()).get(i).x();
                 vector.y = Objects.requireNonNull(mesh.mNormals()).get(i).y();
                 vector.z = Objects.requireNonNull(mesh.mNormals()).get(i).z();
-                vertex.normal = vector;
+                vertex.normal = new Vector3f(vector);
             }
 
-            if (mesh.mTextureCoords().hasRemaining()) {
-                Vector2f vec = new Vector2f();
-                vec.x = mesh.mTextureCoords().get(0);
-                vec.y = mesh.mTextureCoords().get(0);
-                vertex.tex_coords = vec;
+            if (mesh.mTextureCoords(0) != null) {
+                AIVector3D.Buffer tc = mesh.mTextureCoords(0);
+                vertex.tex_coords = new Vector2f(tc.get(i).x(), tc.get(i).y());
             } else {
-                vertex.tex_coords = new Vector2f(0.f, 0.f);
+                vertex.tex_coords = new Vector2f();
             }
+
             vertices.add(vertex);
         }
 

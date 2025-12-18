@@ -117,7 +117,6 @@ public class Camera {
 
         if (this.input_vector.x != 0 || this.input_vector.y != 0 || this.input_vector.z != 0) {
             this.input_vector.normalize();
-            System.out.println(this.input_vector);
         }
     }
 
