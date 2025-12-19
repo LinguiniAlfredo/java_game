@@ -60,7 +60,6 @@ public class Utils {
         return fb;
     }
 
-
     public static IntBuffer indices_to_ib(ArrayList<Integer> indices) {
         IntBuffer ib = BufferUtils.createIntBuffer(indices.size());
         for (Integer i : indices) {

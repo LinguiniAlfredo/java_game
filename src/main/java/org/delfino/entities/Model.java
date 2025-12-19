@@ -133,7 +133,9 @@ public class Model {
 
             if (mesh.mTextureCoords(0) != null) {
                 AIVector3D.Buffer tc = mesh.mTextureCoords(0);
-                vertex.tex_coords = new Vector2f(tc.get(i).x(), tc.get(i).y());
+                if (tc != null) {
+                    vertex.tex_coords = new Vector2f(tc.get(i).x(), tc.get(i).y());
+                }
             } else {
                 vertex.tex_coords = new Vector2f();
             }

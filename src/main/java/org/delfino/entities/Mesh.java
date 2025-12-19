@@ -57,13 +57,13 @@ public class Mesh {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, Context.shadow_map.depth_map);
 
-//        if (!this.textures.isEmpty()) {
-//            shader.set_int("has_texture", GL_TRUE);
-//            glActiveTexture(GL_TEXTURE1);
-//            glBindTexture(GL_TEXTURE_2D, this.textures.get(0).id);
-//        } else {
+        if (!this.textures.isEmpty()) {
+            shader.set_int("has_texture", GL_TRUE);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, this.textures.get(0).id);
+        } else {
             shader.set_int("has_texture", GL_FALSE);
-//        }
+        }
 
         glBindVertexArray(this.VAO);
         glDrawElements(GL_TRIANGLES, this.indices);
@@ -97,8 +97,8 @@ public class Mesh {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, this.indices, GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, false, Float.BYTES * 8, 0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, Float.BYTES * 8, 3);
-        glVertexAttribPointer(2, 2, GL_FLOAT, false, Float.BYTES * 8, 6);
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, Float.BYTES * 8, Float.BYTES * 3);
+        glVertexAttribPointer(2, 2, GL_FLOAT, false, Float.BYTES * 8, Float.BYTES * 6);
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);

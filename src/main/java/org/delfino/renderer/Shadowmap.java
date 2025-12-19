@@ -108,7 +108,7 @@ public class Shadowmap {
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * Float.BYTES, 0);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * Float.BYTES, 3);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * Float.BYTES, Float.BYTES * 3);
 
         glBindVertexArray(quad_vao);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

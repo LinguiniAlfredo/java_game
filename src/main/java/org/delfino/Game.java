@@ -127,7 +127,7 @@ public class Game {
         }
 
         if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_TAB) == GLFW.GLFW_PRESS) {
-//            toggle_paused();
+            toggle_paused();
         }
 
         if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F1) == GLFW.GLFW_PRESS) {
