@@ -179,7 +179,6 @@ public class Model {
             IntBuffer height_buffer = BufferUtils.createIntBuffer(1);
             IntBuffer component_buffer = BufferUtils.createIntBuffer(1);
 
-            STBImage.stbi_set_flip_vertically_on_load(true);
             ByteBuffer data = STBImage.stbi_load(temp_file.toFile().getAbsolutePath(), width_buffer, height_buffer, component_buffer, 0);
 
             if (data != null) {
