@@ -120,8 +120,7 @@ public class Collision {
     }
 
     private ArrayList<Vector3f> get_vertices() {
-        Vector3f min = new Vector3f(this.half_dimensions);
-        min.negate();
+        Vector3f min = new Vector3f(this.half_dimensions).negate();
         Vector3f max = new Vector3f(this.half_dimensions);
 
         ArrayList<Vector3f> vertices = new ArrayList<>();

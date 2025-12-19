@@ -33,12 +33,11 @@ public class Game {
         init_context();
         init_glfw();
 
-        Context.light_cube = new LightCube(new Vector3f(0.f, 5.f, 0.f));
-        Context.camera = new Camera(new Vector3f(0.0f, 0.0f, 20.0f));
+        Context.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
+        Context.camera = new Camera(new Vector3f(0.0f, 10.0f, 20.0f));
         Context.shadow_map = new Shadowmap();
-        Context.world_blocks.add(new Cube(new Vector3f(0.f)));
 
-//        init_level();
+        init_level();
         game_loop();
         close_app();
     }
@@ -112,7 +111,35 @@ public class Game {
     }
 
     private void init_level() {
+        //Context.entities.add(new Link(new Vector3f(5.f, 20.f, 0.f)));
 
+        // create function for cube grid, pass in dims and origin
+        for (int i = 1; i < 20; i+=2) {
+            for (int j = 1; j < 20; j+=2) {
+                float x = (float)i;
+                float z = (float)j;
+                Context.world_blocks.add(new Cube(new Vector3f(x, 0.f, z)));
+                Context.world_blocks.add(new Cube(new Vector3f(-x, 0.f, -z)));
+                Context.world_blocks.add(new Cube(new Vector3f(x, 0.f, -z)));
+                Context.world_blocks.add(new Cube(new Vector3f(-x, 0.f, z)));
+
+                if (x == 9) {
+                    Context.world_blocks.add(new Cube(new Vector3f(x, 2.f, z)));
+                    Context.world_blocks.add(new Cube(new Vector3f(-x, 2.f, -z)));
+                    Context.world_blocks.add(new Cube(new Vector3f(-x, 4.f, -z)));
+                    Context.world_blocks.add(new Cube(new Vector3f(-x, 6.f, -z)));
+                }
+                if (z == 9) {
+                    Context.world_blocks.add(new Cube(new Vector3f(x, 2.f, z)));
+                    Context.world_blocks.add(new Cube(new Vector3f(-x, 2.f, -z)));
+                }
+            }
+        }
+        Context.world_blocks.add(new Cube(new Vector3f(0.f, 4.f, 0.f)));
+        Context.world_blocks.add(new Cube(new Vector3f(-5.f, 2.f, 5.f)));
+
+        Context.world_blocks.add(new Cube(new Vector3f(-17.f, 2.f, 19.f)));
+        Context.world_blocks.add(new Cube(new Vector3f(-19.f, 2.f, 17.f)));
     }
 
     private void handle_events(double delta_time) {

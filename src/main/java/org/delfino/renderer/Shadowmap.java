@@ -39,10 +39,10 @@ public class Shadowmap {
 
     public void do_pass() {
         Matrix4f mat_proj = new Matrix4f()
-                .setOrtho(-20.f, 20.f, -20.f, 20.f, this.near_plane, this.far_plane);
+                .ortho(-20.f, 20.f, -20.f, 20.f, this.near_plane, this.far_plane);
 
         Matrix4f mat_view = new Matrix4f()
-                .setLookAt(new Vector3f(-20.f, 20.f, 0.f), new Vector3f(0.f, 0.f, 0.f), new Vector3f(0.f, 1.f, 0.f));
+                .lookAt(Context.light_cube.position, new Vector3f(0.f, 0.f, 0.f), new Vector3f(0.f, 1.f, 0.f));
 
         this.light_space_matrix = new Matrix4f(mat_proj).mul(mat_view);
 

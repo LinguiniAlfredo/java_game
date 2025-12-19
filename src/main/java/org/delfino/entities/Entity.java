@@ -60,7 +60,7 @@ public class Entity {
         for (int i = 0; i < this.model.meshes.size(); i++) {
             Mesh mesh = this.model.meshes.get(i);
             for (int j = 0; j < mesh.vertices.size(); j++) {
-                Vertex vertex = mesh.vertices.get(i);
+                Vertex vertex = mesh.vertices.get(j);
                 if (vertex.position.x < min_x) {
                     min_x = vertex.position.x;
                 }
