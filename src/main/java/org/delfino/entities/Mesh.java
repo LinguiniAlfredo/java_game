@@ -66,7 +66,7 @@ public class Mesh {
         }
 
         glBindVertexArray(this.VAO);
-        glDrawElements(GL_TRIANGLES, this.indices);
+        glDrawElements(GL_TRIANGLES, this.indices.remaining(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 
@@ -79,7 +79,7 @@ public class Mesh {
         shadow_map_shader.set_mat4("model", mat_model);
 
         glBindVertexArray(this.VAO);
-        glDrawElements(GL_TRIANGLES, this.indices);
+        glDrawElements(GL_TRIANGLES, this.indices.remaining(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 
