@@ -48,11 +48,7 @@ public class Game {
     }
 //
     private void close_app() {
-        Context.current_scene.light_cube.delete();
-        for (Entity world_block : Context.current_scene.world_blocks) {
-            world_block.delete();
-        }
-        Context.current_scene.shadow_map.delete();
+        Context.current_scene.delete();
 
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(Context.window);

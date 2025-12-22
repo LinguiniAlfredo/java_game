@@ -163,7 +163,7 @@ public class Model {
 
     private int texture_from_file(String texture_path) {
         try (InputStream input_stream = Model.class.getClassLoader().getResourceAsStream(this.texture_path)) {
-            Path temp_file = Files.createTempFile("texture-", ".obj");
+            Path temp_file = Files.createTempFile("texture-", ".png");
             temp_file.toFile().deleteOnExit();
 
             try (BufferedOutputStream output_stream = new BufferedOutputStream(Files.newOutputStream(temp_file))) {

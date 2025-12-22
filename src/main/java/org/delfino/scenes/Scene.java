@@ -11,14 +11,11 @@ import org.delfino.entities.Entity;
 import org.delfino.entities.LightCube;
 import org.delfino.renderer.Shadowmap;
 import org.delfino.renderer.Skybox;
-import org.delfino.scenes.dtos.EntityDTO;
-import org.delfino.utils.Shader;
 import org.joml.Vector3f;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Scene {
@@ -45,6 +42,7 @@ public class Scene {
 
     public void render() {
         this.shadow_map.do_pass();
+        this.light_cube.render();
 
         for (Entity world_block : this.world_blocks) {
             world_block.render();
@@ -53,7 +51,6 @@ public class Scene {
             }
         }
 
-        this.light_cube.render();
         for (Entity entity : this.entities) {
             entity.render();
             if (Context.show_collisions) {
@@ -64,13 +61,20 @@ public class Scene {
         if (Context.show_shadow_map) {
             this.shadow_map.render_depth_quad();
         }
+
+        this.skybox.render();
     }
 
     public void delete() {
+        this.light_cube.delete();
+        this.skybox.delete();
+        this.shadow_map.delete();
         for (Entity world_block : this.world_blocks) {
             world_block.delete();
         }
-        this.light_cube.delete();
+        for (Entity entity : this.entities) {
+            entity.delete();
+        }
     }
 
     private void init_entities() {
