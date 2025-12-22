@@ -150,7 +150,7 @@ public class Camera {
         }
     }
 
-    private void update_camera_vectors() {
+    public void update_camera_vectors() {
         float yaw_rad   = (float) Math.toRadians(this.yaw);
         float pitch_rad = (float) Math.toRadians(this.pitch);
         float cos_pitch = (float) Math.cos(pitch_rad);

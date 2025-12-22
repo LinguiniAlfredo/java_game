@@ -52,46 +52,46 @@ public class Collision {
         if (colliding) {
             this.is_colliding  = colliding;
             other.is_colliding = colliding;
-            calc_collision_normal(other);
+//            calc_collision_normal(other);
         }
 
         return colliding;
     }
 
     private void calc_collision_normal(Collision other) {
-//        Vector3f delta = new Vector3f(this.position);
-//        delta.sub(other.position);
-//
-//        Vector3f dim_delta = new Vector3f(this.half_dimensions);
-//        dim_delta.add(other.half_dimensions);
-//
-//        Vector3f norm = new Vector3f(
-//                delta.x / dim_delta.x,
-//                delta.y / dim_delta.y,
-//                delta.z / dim_delta.z
-//        );
-//
-//        Vector3f abs_norm = new Vector3f(
-//                Math.abs(norm.x),
-//                Math.abs(norm.y),
-//                Math.abs(norm.z)
-//        );
-//
-//        Vector3f result = new Vector3f();
-//        float ax = abs_norm.x;
-//        float ay = abs_norm.y;
-//        float az = abs_norm.z;
-//
-//        if (ax >= ay && ax >= az) {
-//            result.set(norm.x, 0f, 0f);
-//        } else if (ay >= ax && ay >= az) {
-//            result.set(0f, norm.y, 0f);
-//        } else {
-//            result.set(0f, 0f, norm.z);
-//        }
-//
-//        result.normalize();
-//        other.normal.set(result);
+        Vector3f delta = new Vector3f(this.position);
+        delta.sub(other.position);
+
+        Vector3f dim_delta = new Vector3f(this.half_dimensions);
+        dim_delta.add(other.half_dimensions);
+
+        Vector3f norm = new Vector3f(
+                delta.x / dim_delta.x,
+                delta.y / dim_delta.y,
+                delta.z / dim_delta.z
+        );
+
+        Vector3f abs_norm = new Vector3f(
+                Math.abs(norm.x),
+                Math.abs(norm.y),
+                Math.abs(norm.z)
+        );
+
+        Vector3f result = new Vector3f();
+        float ax = abs_norm.x;
+        float ay = abs_norm.y;
+        float az = abs_norm.z;
+
+        if (ax >= ay && ax >= az) {
+            result.set(norm.x, 0f, 0f);
+        } else if (ay >= ax && ay >= az) {
+            result.set(0f, norm.y, 0f);
+        } else {
+            result.set(0f, 0f, norm.z);
+        }
+
+        result.normalize();
+        other.normal.set(result);
     }
 
     public void render() {

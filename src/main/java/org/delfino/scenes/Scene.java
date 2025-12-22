@@ -34,6 +34,15 @@ public class Scene {
 //        load_scene_from_file(filename);
     }
 
+    public void reset_colliders() {
+        for (Entity world_block : this.world_blocks) {
+            world_block.collision.reset();
+        }
+        for (Entity entity : this.entities) {
+            entity.collision.reset();
+        }
+    }
+
     public void update(double delta_time) {
         for (Entity entity : this.entities) {
             entity.update(delta_time);

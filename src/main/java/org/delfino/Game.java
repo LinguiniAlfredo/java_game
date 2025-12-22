@@ -7,6 +7,7 @@ import org.delfino.utils.Camera;
 
 import static org.delfino.Gamemode.*;
 
+import org.delfino.utils.PlayerControllerFPS;
 import org.delfino.utils.Timer;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -30,7 +31,7 @@ public class Game {
         init_context();
         init_glfw();
 
-        Context.camera = new Camera(new Vector3f(0.0f, 10.0f, 20.0f));
+        Context.camera = new PlayerControllerFPS(new Vector3f(0.0f, 10.0f, 20.0f));
         Context.current_scene = new Scene("scenes/example_level.json");
 
         game_loop();
@@ -91,7 +92,11 @@ public class Game {
     }
 
     private void toggle_flycam() {
-        // TODO
+        if (!(Context.camera instanceof PlayerControllerFPS)) {
+            Context.camera = new PlayerControllerFPS(Context.camera);
+        } else if (Context.camera instanceof PlayerControllerFPS) {
+            Context.camera = new Camera(Context.camera);
+        }
     }
 
     private void handle_events(double delta_time) {
@@ -137,6 +142,9 @@ public class Game {
     }
 
     private void update(double delta_time) {
+        if (Context.show_collisions) {
+            Context.current_scene.reset_colliders();
+        }
         Context.camera.update(delta_time);
         Context.current_scene.update(delta_time);
     }
