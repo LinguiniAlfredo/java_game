@@ -9,6 +9,7 @@ import org.delfino.utils.Vertex;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.lwjgl.system.MemoryStack;
 
 import static org.lwjgl.opengl.GL30.*;
 
@@ -22,11 +23,17 @@ public class Mesh {
     FloatBuffer        vertex_buffer;
     IntBuffer          indices;
     ArrayList<Texture> textures;
+    Matrix4f           mat_model = new Matrix4f();
 
     public Mesh(ArrayList<Vertex> vertices, ArrayList<Integer> indices, ArrayList<Texture> textures) {
         this.vertices      = vertices;
-        this.vertex_buffer = Utils.vertices_to_fb(vertices);
-        this.indices       = Utils.indices_to_ib(indices);
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            this.vertex_buffer = stack.mallocFloat(this.vertices.size() * 8);
+            Utils.vertices_to_fb(vertices, this.vertex_buffer);
+            this.indices = stack.mallocInt(indices.size());
+            Utils.indices_to_ib(indices, this.indices);
+        }
         this.textures      = textures;
 
         init();
@@ -37,16 +44,10 @@ public class Mesh {
         shader.set_int("shadow_map", 0);
         shader.set_int("texture1", 1);
         shader.set_vec3("camera_pos", Context.camera.position);
-        shader.set_vec3("light_pos", Context.light_cube.position);
-        shader.set_mat4("light_space_matrix", Context.shadow_map.light_space_matrix);
-        shader.set_vec3("light_color", new Vector3f(1.f, 1.f, 1.f));
-        shader.set_vec3("mesh_color",  new Vector3f(1.f, 0.5f, 0.31f));
+        shader.set_vec3("light_pos", Context.current_scene.light_cube.position);
+        shader.set_mat4("light_space_matrix", Context.current_scene.shadow_map.light_space_matrix);
 
-        Matrix4f mat_model = new Matrix4f()
-                .scale(scale)
-                .translate(position)
-                .rotate(orientation);
-
+        mat_model.identity().scale(scale).translate(position).rotate(orientation);
         Matrix4f mat_view = Context.camera.get_view_matrix();
         Matrix4f mat_proj = Context.camera.get_perspective_matrix();
 
@@ -55,7 +56,7 @@ public class Mesh {
         shader.set_mat4("projection", mat_proj);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, Context.shadow_map.depth_map);
+        glBindTexture(GL_TEXTURE_2D, Context.current_scene.shadow_map.depth_map);
 
         if (!this.textures.isEmpty()) {
             shader.set_int("has_texture", GL_TRUE);
@@ -71,10 +72,7 @@ public class Mesh {
     }
 
     public void render_shadow_map(Shader shadow_map_shader, Vector3f position, Quaternionf orientation, float scale) {
-        Matrix4f mat_model = new Matrix4f()
-                .scale(scale)
-                .translate(position)
-                .rotate(orientation);
+        mat_model.identity().scale(scale).translate(position).rotate(orientation);
 
         shadow_map_shader.set_mat4("model", mat_model);
 

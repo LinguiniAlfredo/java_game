@@ -8,65 +8,39 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryStack;
 
 public class Utils {
 
-    public static FloatBuffer vec3_to_fb(Vector3f v) {
-       FloatBuffer fb = BufferUtils.createFloatBuffer(3);
-       fb.put(v.x).put(v.y).put(v.z);
-       fb.flip();
-       return fb;
-    }
-
-    public static FloatBuffer vec4_to_fb(Vector4f v) {
-        FloatBuffer fb = BufferUtils.createFloatBuffer(4);
-        fb.put(v.x).put(v.y).put(v.z).put(v.w);
-        fb.flip();
-        return fb;
-    }
-
-    public static FloatBuffer mat4_to_fb(Matrix4f m) {
-        FloatBuffer fb = BufferUtils.createFloatBuffer(16);
-        m.get(fb);
-        return fb;
-    }
-
-    public static FloatBuffer vertices_to_fb(ArrayList<Vertex> vertices) {
-        FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.size() * 8);
+    // Caller must allocate buffer with MemoryStack
+    public static void vertices_to_fb(ArrayList<Vertex> vertices, FloatBuffer fb) {
         for (Vertex v : vertices) {
             fb.put(v.position.x).put(v.position.y).put(v.position.z);
             fb.put(v.normal.x).put(v.normal.y).put(v.normal.z);
             fb.put(v.tex_coords.x).put(v.tex_coords.y);
         }
         fb.flip();
-        return fb;
     }
 
-    public static FloatBuffer vertices_3f_to_fb(ArrayList<Vector3f> vertices) {
-        FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.size() * 3);
+    public static void vertices_3f_to_fb(ArrayList<Vector3f> vertices, FloatBuffer fb) {
         for (Vector3f v : vertices) {
             fb.put(v.x).put(v.y).put(v.z);
         }
         fb.flip();
-        return fb;
     }
 
-    public static FloatBuffer float_arr_to_fb(float[] vertices) {
-        FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.length);
+    public static void float_arr_to_fb(float[] vertices, FloatBuffer fb) {
         for (float v : vertices) {
             fb.put(v);
         }
         fb.flip();
-        return fb;
     }
 
-    public static IntBuffer indices_to_ib(ArrayList<Integer> indices) {
-        IntBuffer ib = BufferUtils.createIntBuffer(indices.size());
+    public static void indices_to_ib(ArrayList<Integer> indices, IntBuffer ib) {
         for (Integer i : indices) {
             ib.put(i);
         }
         ib.flip();
-        return ib;
     }
 
     public static float clamp_to_zero(float value) {

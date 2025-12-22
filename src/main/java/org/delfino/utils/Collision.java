@@ -4,6 +4,7 @@ import org.delfino.Context;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -16,15 +17,25 @@ public class Collision {
     Vector3f            half_dimensions;
     Vector3f            normal;
     ArrayList<Vector3f> vertices;
+    FloatBuffer         vertex_buffer;
     Shader              shader;
     boolean             is_colliding;
+    Matrix4f            model = new Matrix4f();
+    final Vector3f      red   = new Vector3f(1.f, 0.f, 0.f);
+    final Vector3f      green = new Vector3f(0.f, 1.f, 0.f);
+
 
     public Collision(Vector3f position, float width, float height, float depth) {
         this.position        = position;
         this.half_dimensions = new Vector3f(width * 0.5f, height * 0.5f, depth * 0.5f);
-        this.vertices        = get_vertices();
         this.shader          = new Shader("shaders/simple.vert", "shaders/simple.frag");
         this.is_colliding    = false;
+
+        this.vertices        = get_vertices();
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            this.vertex_buffer = stack.mallocFloat(this.vertices.size() * 3);
+            Utils.vertices_3f_to_fb(this.vertices, this.vertex_buffer);
+        }
         init_vao();
     }
 
@@ -51,47 +62,47 @@ public class Collision {
     }
 
     private void calc_collision_normal(Collision other) {
-        Vector3f delta = new Vector3f(this.position);
-        delta.sub(other.position);
-
-        Vector3f dim_delta = new Vector3f(this.half_dimensions);
-        dim_delta.add(other.half_dimensions);
-
-        Vector3f norm = new Vector3f(
-                delta.x / dim_delta.x,
-                delta.y / dim_delta.y,
-                delta.z / dim_delta.z
-        );
-
-        Vector3f abs_norm = new Vector3f(
-                Math.abs(norm.x),
-                Math.abs(norm.y),
-                Math.abs(norm.z)
-        );
-
-        Vector3f result = new Vector3f();
-        float ax = abs_norm.x;
-        float ay = abs_norm.y;
-        float az = abs_norm.z;
-
-        if (ax >= ay && ax >= az) {
-            result.set(norm.x, 0f, 0f);
-        } else if (ay >= ax && ay >= az) {
-            result.set(0f, norm.y, 0f);
-        } else {
-            result.set(0f, 0f, norm.z);
-        }
-
-        result.normalize();
-        other.normal.set(result);
+//        Vector3f delta = new Vector3f(this.position);
+//        delta.sub(other.position);
+//
+//        Vector3f dim_delta = new Vector3f(this.half_dimensions);
+//        dim_delta.add(other.half_dimensions);
+//
+//        Vector3f norm = new Vector3f(
+//                delta.x / dim_delta.x,
+//                delta.y / dim_delta.y,
+//                delta.z / dim_delta.z
+//        );
+//
+//        Vector3f abs_norm = new Vector3f(
+//                Math.abs(norm.x),
+//                Math.abs(norm.y),
+//                Math.abs(norm.z)
+//        );
+//
+//        Vector3f result = new Vector3f();
+//        float ax = abs_norm.x;
+//        float ay = abs_norm.y;
+//        float az = abs_norm.z;
+//
+//        if (ax >= ay && ax >= az) {
+//            result.set(norm.x, 0f, 0f);
+//        } else if (ay >= ax && ay >= az) {
+//            result.set(0f, norm.y, 0f);
+//        } else {
+//            result.set(0f, 0f, norm.z);
+//        }
+//
+//        result.normalize();
+//        other.normal.set(result);
     }
 
     public void render() {
-        Matrix4f model = new Matrix4f().translate(this.position);
+        this.model.identity().translate(this.position);
 
         Matrix4f view = Context.camera.get_view_matrix();
         Matrix4f proj = Context.camera.get_perspective_matrix();
-        Vector3f color = this.is_colliding ? new Vector3f(1.f, 0.f, 0.f) : new Vector3f(0.f, 1.f, 0.f);
+        Vector3f color = this.is_colliding ? this.red : this.green;
 
         this.shader.use();
         this.shader.set_mat4("model", model);
@@ -113,7 +124,7 @@ public class Collision {
         this.VBO = glGenBuffers();
         glBindVertexArray(this.VAO);
         glBindBuffer(GL_ARRAY_BUFFER, this.VBO);
-        glBufferData(GL_ARRAY_BUFFER, Utils.vertices_3f_to_fb(this.vertices), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, this.vertex_buffer, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, Float.BYTES * 3, 0);
         glBindVertexArray(0);

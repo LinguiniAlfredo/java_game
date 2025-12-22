@@ -16,8 +16,6 @@ uniform bool has_texture;
 
 uniform vec3 camera_pos;
 uniform vec3 light_pos;
-uniform vec3 light_color; // set light color here instead ?
-uniform vec3 mesh_color;
 
 float shadow_calculation(vec4 frag_pos_light_space)
 {
@@ -50,9 +48,11 @@ float shadow_calculation(vec4 frag_pos_light_space)
 
 void main()
 {
-    float shininess  = 64.0;
-    float speculance = 1.0;
-    float ambience   = 0.3;
+    vec3  mesh_color  = vec3(1.f, 0.5f, 0.31f);
+    vec3  light_color = vec3(1.f, 1.f, 1.f);
+    float shininess   = 64.0;
+    float speculance  = 1.0;
+    float ambience    = 0.3;
 
     vec3 color;
     if (has_texture) {

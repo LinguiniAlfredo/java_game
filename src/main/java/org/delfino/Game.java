@@ -1,15 +1,10 @@
 package org.delfino;
 
 import org.apache.commons.lang3.SystemUtils;
-import org.delfino.entities.Cube;
 import org.delfino.entities.Entity;
-import org.delfino.entities.LightCube;
-import org.delfino.renderer.Shadowmap;
-import org.delfino.renderer.Skybox;
-import org.delfino.ui.UI;
+import org.delfino.scenes.Scene;
 import org.delfino.utils.Camera;
 
-import static org.delfino.Context.window;
 import static org.delfino.Gamemode.*;
 
 import org.delfino.utils.Timer;
@@ -19,7 +14,6 @@ import org.lwjgl.system.*;
 
 import org.joml.Vector3f;
 import java.nio.*;
-import java.util.Vector;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -29,15 +23,16 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Game {
 
+    double[] mouse_x = new double[1];
+    double[] mouse_y = new double[1];
+
     public void run() {
         init_context();
         init_glfw();
 
-        Context.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
         Context.camera = new Camera(new Vector3f(0.0f, 10.0f, 20.0f));
-        Context.shadow_map = new Shadowmap();
+        Context.current_scene = new Scene("scenes/example_level.json");
 
-        init_level();
         game_loop();
         close_app();
     }
@@ -53,11 +48,11 @@ public class Game {
     }
 //
     private void close_app() {
-        Context.light_cube.delete();
-        for (Entity world_block : Context.world_blocks) {
+        Context.current_scene.light_cube.delete();
+        for (Entity world_block : Context.current_scene.world_blocks) {
             world_block.delete();
         }
-        Context.shadow_map.delete();
+        Context.current_scene.shadow_map.delete();
 
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(Context.window);
@@ -103,48 +98,7 @@ public class Game {
         // TODO
     }
 
-    private void destroy_level() {
-        for (Entity world_block : Context.world_blocks) {
-            world_block.delete();
-        }
-        Context.light_cube.delete();
-    }
-
-    private void init_level() {
-        //Context.entities.add(new Link(new Vector3f(5.f, 20.f, 0.f)));
-
-        // create function for cube grid, pass in dims and origin
-        for (int i = 1; i < 20; i+=2) {
-            for (int j = 1; j < 20; j+=2) {
-                float x = (float)i;
-                float z = (float)j;
-                Context.world_blocks.add(new Cube(new Vector3f(x, 0.f, z)));
-                Context.world_blocks.add(new Cube(new Vector3f(-x, 0.f, -z)));
-                Context.world_blocks.add(new Cube(new Vector3f(x, 0.f, -z)));
-                Context.world_blocks.add(new Cube(new Vector3f(-x, 0.f, z)));
-
-                if (x == 9) {
-                    Context.world_blocks.add(new Cube(new Vector3f(x, 2.f, z)));
-                    Context.world_blocks.add(new Cube(new Vector3f(-x, 2.f, -z)));
-                    Context.world_blocks.add(new Cube(new Vector3f(-x, 4.f, -z)));
-                    Context.world_blocks.add(new Cube(new Vector3f(-x, 6.f, -z)));
-                }
-                if (z == 9) {
-                    Context.world_blocks.add(new Cube(new Vector3f(x, 2.f, z)));
-                    Context.world_blocks.add(new Cube(new Vector3f(-x, 2.f, -z)));
-                }
-            }
-        }
-        Context.world_blocks.add(new Cube(new Vector3f(0.f, 4.f, 0.f)));
-        Context.world_blocks.add(new Cube(new Vector3f(-5.f, 2.f, 5.f)));
-
-        Context.world_blocks.add(new Cube(new Vector3f(-17.f, 2.f, 19.f)));
-        Context.world_blocks.add(new Cube(new Vector3f(-19.f, 2.f, 17.f)));
-    }
-
     private void handle_events(double delta_time) {
-        double[] mouse_x = new double[1];
-        double[] mouse_y = new double[1];
         glfwGetCursorPos(Context.window, mouse_x, mouse_y);
 
         glfwPollEvents();
@@ -174,9 +128,8 @@ public class Game {
         }
 
         if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_1) == GLFW.GLFW_PRESS) {
-            destroy_level();
-            init_level();
         }
+
         Context.camera.process_keyboard();
         if (Context.gamemode != PAUSED) {
             Context.camera.process_mouse(mouse_x[0], mouse_y[0], delta_time);
@@ -189,31 +142,15 @@ public class Game {
 
     private void update(double delta_time) {
         Context.camera.update(delta_time);
+        Context.current_scene.update(delta_time);
     }
 
     private void render() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Context.shadow_map.do_pass();
 
-        for (Entity world_block : Context.world_blocks) {
-            world_block.render();
-            if (Context.show_collisions) {
-                world_block.render_collider();
-            }
-        }
+        Context.current_scene.render();
 
-        Context.light_cube.render();
-        for (Entity entity : Context.entities) {
-            entity.render();
-            if (Context.show_collisions) {
-                entity.render_collider();
-            }
-        }
-
-        if (Context.show_shadow_map) {
-            Context.shadow_map.render_depth_quad();
-        }
         glfwSwapBuffers(Context.window);
     }
 

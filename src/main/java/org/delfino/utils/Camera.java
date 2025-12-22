@@ -31,6 +31,9 @@ public class Camera {
     public Vector3f trajectory;
     public Vector3f input_vector;
 
+    private final Matrix4f view_matrix = new Matrix4f();
+    private final Matrix4f proj_matrix = new Matrix4f();
+
     public float yaw;
     public float pitch;
     public float movement_speed;
@@ -78,19 +81,25 @@ public class Camera {
 
     public void update(double delta_time) {
         update_camera_vectors();
-        this.position.add(new Vector3f(this.trajectory).mul(this.movement_speed).mul((float)delta_time));
+        float scale = this.movement_speed * (float) delta_time;
+        this.position.fma(scale, this.trajectory);
     }
 
     public Matrix4f get_view_matrix() {
-        return new Matrix4f().lookAt(this.position, new Vector3f(this.position).add(this.front), this.up);
+        return view_matrix
+                .identity()
+                .lookAlong(this.front, this.up)
+                .translate(-this.position.x, -this.position.y, -this.position.z);
     }
 
     public Matrix4f get_perspective_matrix() {
-        return new Matrix4f().setPerspective(frustrum.fov, frustrum.aspect, frustrum.near, frustrum.far);
+        return proj_matrix
+                .identity()
+                .perspective(this.frustrum.fov, this.frustrum.aspect, this.frustrum.near, this.frustrum.far);
     }
 
     public void process_keyboard() {
-        this.input_vector = new Vector3f(0.f);
+        this.input_vector.zero();
         this.movement_speed = SPEED;
 
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS) {
@@ -142,19 +151,23 @@ public class Camera {
     }
 
     private void update_camera_vectors() {
-        Vector3f f = new Vector3f();
-        f.x = (float) (Math.cos(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
-        f.y = (float) (Math.sin(Math.toRadians(this.pitch)));
-        f.z = (float) (Math.sin(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
+        float yaw_rad   = (float) Math.toRadians(this.yaw);
+        float pitch_rad = (float) Math.toRadians(this.pitch);
+        float cos_pitch = (float) Math.cos(pitch_rad);
 
-        this.front = new Vector3f(f).normalize();
-        this.right = new Vector3f(this.front).cross(this.world_up).normalize();
-        this.up    = new Vector3f(this.right).cross(this.front).normalize();
+        this.front.set(
+                (float) Math.cos(yaw_rad) * cos_pitch,
+                (float) Math.sin(pitch_rad),
+                (float) Math.sin(yaw_rad) * cos_pitch
+        ).normalize();
 
-        this.trajectory = new Vector3f(0.f);
-        this.trajectory.add(new Vector3f(right).mul(input_vector.x, new Vector3f()));
-        this.trajectory.add(new Vector3f(up).mul(input_vector.y, new Vector3f()));
-        this.trajectory.add(new Vector3f(front).mul(input_vector.z, new Vector3f()));
+        this.front.cross(this.world_up, this.right).normalize();
+        this.right.cross(this.front, this.up).normalize();
+
+        this.trajectory.zero();
+        this.trajectory.fma(input_vector.x, right)
+                .fma(input_vector.y, up)
+                .fma(input_vector.z, front);
     }
 
 }

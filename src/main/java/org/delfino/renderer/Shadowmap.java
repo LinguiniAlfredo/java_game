@@ -6,8 +6,10 @@ import org.delfino.utils.Shader;
 import org.delfino.utils.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL30.*;
 
@@ -15,17 +17,32 @@ public class Shadowmap {
     public final int DEPTH_MAP_WIDTH  = 2048;
     public final int DEPTH_MAP_HEIGHT = 2048;
 
-    public int      depth_map;
-    public int      FBO;
-    public float    near_plane, far_plane;
-    public Matrix4f light_space_matrix;
-    public Shader   shader, depth_quad_shader;
+    public int         depth_map;
+    public int         FBO;
+    public float       near_plane, far_plane;
+    public Matrix4f    light_space_matrix = new Matrix4f();
+    public Shader      shader, depth_quad_shader;
+    public Matrix4f    mat_proj = new Matrix4f();
+    public Matrix4f    mat_view = new Matrix4f();
+    public FloatBuffer quad_vertex_buffer;
 
     public Shadowmap() {
         this.near_plane   = 0.5f;
         this.far_plane    = 100.f;
         shader            = new Shader("shaders/depth.vert", "shaders/depth.frag");
         depth_quad_shader = new Shader("shaders/depth_quad.vert", "shaders/depth_quad.frag");
+
+        float[] quad_vertices = {
+                // positions        // texture Coords
+                -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+                -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+                1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+                1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            this.quad_vertex_buffer = stack.mallocFloat(quad_vertices.length);
+            Utils.float_arr_to_fb(quad_vertices, this.quad_vertex_buffer);
+        }
 
         init();
     }
@@ -38,13 +55,14 @@ public class Shadowmap {
     }
 
     public void do_pass() {
-        Matrix4f mat_proj = new Matrix4f()
+        mat_proj.identity()
                 .ortho(-20.f, 20.f, -20.f, 20.f, this.near_plane, this.far_plane);
 
-        Matrix4f mat_view = new Matrix4f()
-                .lookAt(Context.light_cube.position, new Vector3f(0.f, 0.f, 0.f), new Vector3f(0.f, 1.f, 0.f));
+        mat_view.identity()
+                .lookAlong(0.f, 0.f, 0.f, 0.f, 0.1f, 0.f)
+                .translate(-Context.current_scene.light_cube.position.x, -Context.current_scene.light_cube.position.y, -Context.current_scene.light_cube.position.z);
 
-        this.light_space_matrix = new Matrix4f(mat_proj).mul(mat_view);
+        this.light_space_matrix.set(mat_proj.mul(mat_view));
 
         this.shader.use();
         this.shader.set_mat4("light_space_matrix", this.light_space_matrix);
@@ -92,19 +110,12 @@ public class Shadowmap {
         int quad_vao;
         int quad_vbo;
 
-        float[] quad_vertices = {
-                // positions        // texture Coords
-                -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-                -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-                1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-                1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        };
 
         quad_vao = glGenVertexArrays();
         quad_vbo = glGenBuffers();
         glBindVertexArray(quad_vao);
         glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-        glBufferData(GL_ARRAY_BUFFER, Utils.float_arr_to_fb(quad_vertices), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, this.quad_vertex_buffer, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * Float.BYTES, 0);
         glEnableVertexAttribArray(1);
@@ -117,10 +128,10 @@ public class Shadowmap {
     }
 
     public void render_shadow_map() {
-        for (Entity world_block : Context.world_blocks) {
+        for (Entity world_block : Context.current_scene.world_blocks) {
             world_block.render_shadow_map(this.shader);
         }
-        for (Entity entity : Context.entities) {
+        for (Entity entity : Context.current_scene.entities) {
             entity.render_shadow_map(this.shader);
         }
     }

@@ -5,6 +5,7 @@ import org.delfino.utils.Shader;
 import org.delfino.utils.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
 
@@ -17,6 +18,7 @@ public class LightCube {
     public FloatBuffer vertex_buffer;
     public Shader shader;
     public int VAO, VBO;
+    public Matrix4f mat_model = new Matrix4f();
 
     public LightCube(Vector3f position) {
         this.vertices = new float[]{
@@ -62,7 +64,10 @@ public class LightCube {
                 -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
                 -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
         };
-        this.vertex_buffer = Utils.float_arr_to_fb(this.vertices);
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            this.vertex_buffer = stack.mallocFloat(this.vertices.length);
+            Utils.float_arr_to_fb(this.vertices, this.vertex_buffer);
+        }
         this.position = position;
         this.shader = new Shader("shaders/lightcube.vert", "shaders/lightcube.frag");
         init();
@@ -76,7 +81,7 @@ public class LightCube {
 
     public void render() {
         this.shader.use();
-        Matrix4f mat_model = new Matrix4f().translate(this.position);
+        mat_model.identity().translate(this.position);
         Matrix4f mat_view = Context.camera.get_view_matrix();
         Matrix4f mat_proj = Context.camera.get_perspective_matrix();
         this.shader.set_mat4("model", mat_model);

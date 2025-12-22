@@ -79,19 +79,33 @@ public class Shader {
 
     public void set_vec3(String name, Vector3f value) {
         int location = glGetUniformLocation(this.id, name);
-        FloatBuffer fb = Utils.vec3_to_fb(value);
-        glUniform3fv(location, fb);
+        FloatBuffer fb;
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            fb = stack.mallocFloat(3);
+            fb.put(value.x).put(value.y).put(value.z);
+            fb.flip();
+            glUniform3fv(location, fb);
+        }
     }
 
-    public void set_vec4(String name, Vector4f value) {
+    public void set_vec4(String name, Vector4f v) {
         int location = glGetUniformLocation(this.id, name);
-        FloatBuffer fb = Utils.vec4_to_fb(value);
-        glUniform4fv(location, fb);
+        FloatBuffer fb;
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            fb = stack.mallocFloat(4);
+            fb.put(v.x).put(v.y).put(v.z).put(v.w);
+            fb.flip();
+            glUniform4fv(location, fb);
+        }
     }
 
-    public void set_mat4(String name, Matrix4f value) {
+    public void set_mat4(String name, Matrix4f m) {
         int location = glGetUniformLocation(this.id, name);
-        FloatBuffer fb = Utils.mat4_to_fb(value);
-        glUniformMatrix4fv(location, false, fb);
+        FloatBuffer fb;
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            fb = stack.mallocFloat(16);
+            m.get(fb);
+            glUniformMatrix4fv(location, false, fb);
+        }
     }
 }
