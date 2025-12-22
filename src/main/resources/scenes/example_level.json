@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "type": "cube",
+        "position": [0, 5, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+    },
+    {
+        "id": 2,
+        "type": "cube",
+        "position": [0, -5, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+    },
+    {
+        "id": 3,
+        "type": "cube",
+        "position": [-5, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+    },
+    {
+        "id": 4,
+        "type": "cube",
+        "position": [5, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+    }
+]
