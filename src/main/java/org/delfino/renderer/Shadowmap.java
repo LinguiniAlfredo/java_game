@@ -55,9 +55,11 @@ public class Shadowmap {
         mat_proj.identity()
                 .ortho(-20.f, 20.f, -20.f, 20.f, this.near_plane, this.far_plane);
 
-        mat_view.identity()
-                .lookAlong(0.f, 0.f, 0.f, 0.f, 0.1f, 0.f)
-                .translate(-Context.current_scene.light_cube.position.x, -Context.current_scene.light_cube.position.y, -Context.current_scene.light_cube.position.z);
+        // TODO - Remove heap allocation if gc causes stuttering, currently the only heap alloc in the loop
+//        mat_view.identity()
+//                .lookAlong(0.f, 0.f, 0.f, 0.f, 0.1f, 0.f)
+//                .translate(-Context.current_scene.light_cube.position.x, -Context.current_scene.light_cube.position.y, -Context.current_scene.light_cube.position.z);
+        mat_view = new Matrix4f().lookAt(Context.current_scene.light_cube.position, new Vector3f(0.f), new Vector3f(0.f, 1.f, 0.f));
 
         this.light_space_matrix.set(mat_proj.mul(mat_view));
 
