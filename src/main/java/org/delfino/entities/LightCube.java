@@ -64,10 +64,7 @@ public class LightCube {
                 -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
                 -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
         };
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            this.vertex_buffer = stack.mallocFloat(this.vertices.length);
-            Utils.float_arr_to_fb(this.vertices, this.vertex_buffer);
-        }
+        this.vertex_buffer = Utils.float_arr_to_fb(this.vertices);
         this.position = position;
         this.shader = new Shader("shaders/lightcube.vert", "shaders/lightcube.frag");
         init();

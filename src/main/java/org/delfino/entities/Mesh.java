@@ -27,13 +27,8 @@ public class Mesh {
 
     public Mesh(ArrayList<Vertex> vertices, ArrayList<Integer> indices, ArrayList<Texture> textures) {
         this.vertices      = vertices;
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            this.vertex_buffer = stack.mallocFloat(this.vertices.size() * 8);
-            Utils.vertices_to_fb(vertices, this.vertex_buffer);
-            this.indices = stack.mallocInt(indices.size());
-            Utils.indices_to_ib(indices, this.indices);
-        }
+        this.vertex_buffer = Utils.vertices_to_fb(this.vertices);
+        this.indices       = Utils.indices_to_ib(indices);
         this.textures      = textures;
 
         init();

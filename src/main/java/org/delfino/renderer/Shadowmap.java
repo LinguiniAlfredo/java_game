@@ -39,10 +39,7 @@ public class Shadowmap {
                 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
                 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
         };
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            this.quad_vertex_buffer = stack.mallocFloat(quad_vertices.length);
-            Utils.float_arr_to_fb(quad_vertices, this.quad_vertex_buffer);
-        }
+        this.quad_vertex_buffer = Utils.float_arr_to_fb(quad_vertices);
 
         init();
     }

@@ -32,10 +32,7 @@ public class Collision {
         this.is_colliding    = false;
 
         this.vertices        = get_vertices();
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            this.vertex_buffer = stack.mallocFloat(this.vertices.size() * 3);
-            Utils.vertices_3f_to_fb(this.vertices, this.vertex_buffer);
-        }
+        this.vertex_buffer   = Utils.vertices_3f_to_fb(this.vertices);
         init_vao();
     }
 
