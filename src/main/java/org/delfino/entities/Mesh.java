@@ -38,13 +38,13 @@ public class Mesh {
         shader.use();
         shader.set_int("shadow_map", 0);
         shader.set_int("texture1", 1);
-        shader.set_vec3("camera_pos", Context.camera.position);
+        shader.set_vec3("camera_pos", Context.current_scene.camera.position);
         shader.set_vec3("light_pos", Context.current_scene.light_cube.position);
         shader.set_mat4("light_space_matrix", Context.current_scene.shadow_map.light_space_matrix);
 
         mat_model.identity().scale(scale).translate(position).rotate(orientation);
-        Matrix4f mat_view = Context.camera.get_view_matrix();
-        Matrix4f mat_proj = Context.camera.get_perspective_matrix();
+        Matrix4f mat_view = Context.current_scene.camera.get_view_matrix();
+        Matrix4f mat_proj = Context.current_scene.camera.get_perspective_matrix();
 
         shader.set_mat4("model", mat_model);
         shader.set_mat4("view", mat_view);

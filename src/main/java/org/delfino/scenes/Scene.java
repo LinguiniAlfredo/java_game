@@ -11,6 +11,8 @@ import org.delfino.entities.Entity;
 import org.delfino.entities.LightCube;
 import org.delfino.renderer.Shadowmap;
 import org.delfino.renderer.Skybox;
+import org.delfino.utils.Camera;
+import org.delfino.utils.PlayerControllerFPS;
 import org.joml.Vector3f;
 
 import java.io.FileReader;
@@ -19,6 +21,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 
 public class Scene {
+    public Camera camera;
     public Skybox            skybox;
     public LightCube         light_cube;
     public ArrayList<Entity> world_blocks = new ArrayList<>();
@@ -26,6 +29,7 @@ public class Scene {
     public Shadowmap         shadow_map;
 
     public Scene(String filename) {
+        this.camera     = new PlayerControllerFPS(new Vector3f(0.f, 10.f, 20.f));
         this.skybox     = new Skybox();
         this.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
         this.shadow_map = new Shadowmap();
@@ -44,6 +48,10 @@ public class Scene {
     }
 
     public void update(double delta_time) {
+        if (Context.show_collisions) {
+            reset_colliders();
+        }
+        this.camera.update(delta_time);
         for (Entity entity : this.entities) {
             entity.update(delta_time);
         }

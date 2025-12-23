@@ -97,8 +97,8 @@ public class Collision {
     public void render() {
         this.model.identity().translate(this.position);
 
-        Matrix4f view = Context.camera.get_view_matrix();
-        Matrix4f proj = Context.camera.get_perspective_matrix();
+        Matrix4f view = Context.current_scene.camera.get_view_matrix();
+        Matrix4f proj = Context.current_scene.camera.get_perspective_matrix();
         Vector3f color = this.is_colliding ? this.red : this.green;
 
         this.shader.use();

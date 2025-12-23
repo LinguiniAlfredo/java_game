@@ -31,7 +31,6 @@ public class Game {
         init_context();
         init_glfw();
 
-        Context.camera = new PlayerControllerFPS(new Vector3f(0.0f, 10.0f, 20.0f));
         Context.current_scene = new Scene("scenes/example_level.json");
 
         game_loop();
@@ -92,10 +91,10 @@ public class Game {
     }
 
     private void toggle_flycam() {
-        if (!(Context.camera instanceof PlayerControllerFPS)) {
-            Context.camera = new PlayerControllerFPS(Context.camera);
-        } else if (Context.camera instanceof PlayerControllerFPS) {
-            Context.camera = new Camera(Context.camera);
+        if (!(Context.current_scene.camera instanceof PlayerControllerFPS)) {
+            Context.current_scene.camera = new PlayerControllerFPS(Context.current_scene.camera);
+        } else if (Context.current_scene.camera instanceof PlayerControllerFPS) {
+            Context.current_scene.camera = new Camera(Context.current_scene.camera);
         }
     }
 
@@ -131,21 +130,14 @@ public class Game {
         if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_1) == GLFW.GLFW_PRESS) {
         }
 
-        Context.camera.process_keyboard();
+        Context.current_scene.camera.process_keyboard();
         if (Context.gamemode != PAUSED) {
-            Context.camera.process_mouse(mouse_x[0], mouse_y[0], delta_time);
+            Context.current_scene.camera.process_mouse(mouse_x[0], mouse_y[0], delta_time);
         }
 
-    }
-
-    private void reset_colliders() {
     }
 
     private void update(double delta_time) {
-        if (Context.show_collisions) {
-            Context.current_scene.reset_colliders();
-        }
-        Context.camera.update(delta_time);
         Context.current_scene.update(delta_time);
     }
 
