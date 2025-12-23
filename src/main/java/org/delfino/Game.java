@@ -1,8 +1,8 @@
 package org.delfino;
 
 import org.apache.commons.lang3.SystemUtils;
-import org.delfino.entities.Entity;
 import org.delfino.scenes.Scene;
+import org.delfino.ui.UI;
 import org.delfino.utils.Camera;
 
 import static org.delfino.Gamemode.*;
@@ -13,7 +13,6 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
-import org.joml.Vector3f;
 import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
@@ -31,6 +30,7 @@ public class Game {
         init_context();
         init_glfw();
 
+        Context.ui            = new UI();
         Context.current_scene = new Scene("scenes/example_level.json");
 
         game_loop();
@@ -77,24 +77,31 @@ public class Game {
     }
 
     private void toggle_paused() {
-        if (Context.gamemode == PAUSED) {
-            glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            // relative mouse mode true ?
-            glfwSetCursorPos(Context.window, Context.screen_width * 0.5, Context.screen_height * 0.5);
-            Context.gamemode = GAME;
-        } else {
-            glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
-            // relative mouse mode false ?
-            glfwSetCursorPos(Context.window, Context.screen_width * 0.5, Context.screen_height * 0.5);
-            Context.gamemode = PAUSED;
+        if (Context.gamemode != EDIT) {
+            if (Context.gamemode == PAUSED) {
+                glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                // relative mouse mode true ?
+                glfwSetCursorPos(Context.window, Context.screen_width * 0.5, Context.screen_height * 0.5);
+                Context.gamemode = GAME;
+            } else {
+                glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
+                // relative mouse mode false ?
+                glfwSetCursorPos(Context.window, Context.screen_width * 0.5, Context.screen_height * 0.5);
+                Context.gamemode = PAUSED;
+            }
         }
     }
 
-    private void toggle_flycam() {
-        if (!(Context.current_scene.camera instanceof PlayerControllerFPS)) {
-            Context.current_scene.camera = new PlayerControllerFPS(Context.current_scene.camera);
-        } else if (Context.current_scene.camera instanceof PlayerControllerFPS) {
-            Context.current_scene.camera = new Camera(Context.current_scene.camera);
+    private void toggle_editor() {
+        if (Context.gamemode != PAUSED) {
+            Camera current_cam = Context.camera;
+            if (Context.gamemode == EDIT) {
+                Context.gamemode = GAME;
+                Context.camera = new PlayerControllerFPS(Context.camera);
+            } else {
+                Context.gamemode = EDIT;
+                Context.camera = new Camera(Context.camera);
+            }
         }
     }
 
@@ -124,7 +131,7 @@ public class Game {
         }
 
         if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F5) == GLFW.GLFW_PRESS) {
-            toggle_flycam();
+            toggle_editor();
         }
 
         if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_1) == GLFW.GLFW_PRESS) {
@@ -146,6 +153,7 @@ public class Game {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         Context.current_scene.render();
+        Context.ui.render();
 
         glfwSwapBuffers(Context.window);
     }

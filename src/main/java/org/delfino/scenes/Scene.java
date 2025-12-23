@@ -21,7 +21,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 
 public class Scene {
-    public Camera camera;
+    public Camera            camera;
     public Skybox            skybox;
     public LightCube         light_cube;
     public ArrayList<Entity> world_blocks = new ArrayList<>();

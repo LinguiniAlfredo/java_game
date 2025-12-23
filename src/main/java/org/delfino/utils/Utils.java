@@ -1,6 +1,7 @@
 package org.delfino.utils;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import java.nio.FloatBuffer;
@@ -18,6 +19,15 @@ public class Utils {
             fb.put(v.position.x).put(v.position.y).put(v.position.z);
             fb.put(v.normal.x).put(v.normal.y).put(v.normal.z);
             fb.put(v.tex_coords.x).put(v.tex_coords.y);
+        }
+        fb.flip();
+        return fb;
+    }
+
+    public static FloatBuffer vertices_2f_to_fb(ArrayList<Vector2f> vertices) {
+        FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.size() * 2);
+        for (Vector2f v : vertices) {
+            fb.put(v.x).put(v.y);
         }
         fb.flip();
         return fb;
