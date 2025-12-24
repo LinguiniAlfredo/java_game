@@ -48,6 +48,7 @@ public class Game {
     }
 //
     private void close_app() {
+        Context.ui.delete();
         Context.current_scene.delete();
 
         // Free the window callbacks and destroy the window
@@ -79,14 +80,8 @@ public class Game {
     private void toggle_paused() {
         if (Context.gamemode != EDIT) {
             if (Context.gamemode == PAUSED) {
-                glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                // relative mouse mode true ?
-                glfwSetCursorPos(Context.window, Context.screen_width * 0.5, Context.screen_height * 0.5);
                 Context.gamemode = GAME;
             } else {
-                glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
-                // relative mouse mode false ?
-                glfwSetCursorPos(Context.window, Context.screen_width * 0.5, Context.screen_height * 0.5);
                 Context.gamemode = PAUSED;
             }
         }
@@ -94,14 +89,17 @@ public class Game {
 
     private void toggle_editor() {
         if (Context.gamemode != PAUSED) {
-            Camera current_cam = Context.camera;
+            Camera current_cam = Context.current_scene.camera;
+            Camera new_cam = null;
             if (Context.gamemode == EDIT) {
                 Context.gamemode = GAME;
-                Context.camera = new PlayerControllerFPS(Context.camera);
+                new_cam = new PlayerControllerFPS(current_cam);
             } else {
                 Context.gamemode = EDIT;
-                Context.camera = new Camera(Context.camera);
+                new_cam = new Camera(current_cam);
             }
+
+            Context.current_scene.camera = new_cam;
         }
     }
 
@@ -110,38 +108,19 @@ public class Game {
 
         glfwPollEvents();
 
-        if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_ESCAPE) == GLFW.GLFW_PRESS) {
-            Context.gamemode = QUIT;
-        }
-
-        if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_TAB) == GLFW.GLFW_PRESS) {
-            toggle_paused();
-        }
-
-        if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F1) == GLFW.GLFW_PRESS) {
-            toggle_wireframe();
-        }
-
-        if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F2) == GLFW.GLFW_PRESS) {
-            toggle_shadow_map();
-        }
-
-        if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F3) == GLFW.GLFW_PRESS) {
-            toggle_collision_render();
-        }
-
-        if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F5) == GLFW.GLFW_PRESS) {
-            toggle_editor();
-        }
-
-        if (GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_1) == GLFW.GLFW_PRESS) {
-        }
-
         Context.current_scene.camera.process_keyboard();
         if (Context.gamemode != PAUSED) {
             Context.current_scene.camera.process_mouse(mouse_x[0], mouse_y[0], delta_time);
         }
+    }
 
+    private boolean is_key_released() {
+        return GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+                GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_TAB) != GLFW_PRESS &&
+                GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F1) != GLFW_PRESS &&
+                GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F2) != GLFW_PRESS &&
+                GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F3) != GLFW_PRESS &&
+                GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F5) != GLFW_PRESS;
     }
 
     private void update(double delta_time) {
@@ -210,6 +189,20 @@ public class Game {
         glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glEnable(GL_DEPTH_TEST);
         glViewport(0, 0, Context.screen_width, Context.screen_height);
+
+        GLFW.glfwSetKeyCallback(Context.window, (window, key, scancode, action, mods) -> {
+            if (action == GLFW.GLFW_PRESS) {
+                switch (key) {
+                    case GLFW.GLFW_KEY_TAB -> toggle_paused();
+                    case GLFW.GLFW_KEY_F1 -> toggle_wireframe();
+                    case GLFW.GLFW_KEY_F2 -> toggle_shadow_map();
+                    case GLFW.GLFW_KEY_F3 -> toggle_collision_render();
+                    case GLFW.GLFW_KEY_F5 -> toggle_editor();
+                    case GLFW.GLFW_KEY_ESCAPE -> Context.gamemode = QUIT;
+                }
+            }
+        });
+
     }
 
     private void game_loop() {
@@ -233,6 +226,11 @@ public class Game {
                     render();
                 }
                 case PAUSED -> render();
+                case EDIT -> {
+                    // TODO - maybe go back to scene default state and pause there
+                    Context.current_scene.camera.update(delta_time);
+                    render();
+                }
             }
 
             double ticks = fps_cap_timer.get_ticks();

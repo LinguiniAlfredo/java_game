@@ -2,11 +2,9 @@ package org.delfino;
 
 import org.delfino.scenes.Scene;
 import org.delfino.ui.*;
-import org.delfino.utils.*;
 
 public record Context() {
     public static long              window;
-    public static Camera            camera;
     public static UI                ui;
     public static Gamemode          gamemode;
     public static Scene             current_scene;
