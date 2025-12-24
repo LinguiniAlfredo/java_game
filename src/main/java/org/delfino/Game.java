@@ -114,15 +114,6 @@ public class Game {
         }
     }
 
-    private boolean is_key_released() {
-        return GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-                GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_TAB) != GLFW_PRESS &&
-                GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F1) != GLFW_PRESS &&
-                GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F2) != GLFW_PRESS &&
-                GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F3) != GLFW_PRESS &&
-                GLFW.glfwGetKey(Context.window, GLFW.GLFW_KEY_F5) != GLFW_PRESS;
-    }
-
     private void update(double delta_time) {
         Context.current_scene.update(delta_time);
     }
