@@ -16,6 +16,7 @@ public class Entity {
     public Quaternionf orientation;
     public Quaternionf target_orientation;
     public float       scale;
+    public boolean     selected = false;
 
     public Entity(String filename, Vector3f position, Quaternionf orientation, float scale, String texture) {
         this.position           = position;
@@ -41,7 +42,7 @@ public class Entity {
     }
 
     public void render() {
-        this.model.render(this.shader, this.position, this.orientation, this.scale);
+        this.model.render(this.shader, this.position, this.orientation, this.scale, this.selected);
     }
 
     public void render_collider() {

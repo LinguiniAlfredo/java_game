@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 
+import static org.lwjgl.glfw.GLFW.*;
+
 public class Scene {
     public Camera            camera;
     public Skybox            skybox;
@@ -30,12 +32,31 @@ public class Scene {
 
     public Scene(String filename) {
         this.camera     = new PlayerControllerFPS(new Vector3f(0.f, 10.f, 20.f));
+        Context.camera  = this.camera;
+
         this.skybox     = new Skybox();
         this.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
         this.shadow_map = new Shadowmap();
 
         init_entities();
+        glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 //        load_scene_from_file(filename);
+    }
+
+    public void reload() {
+        this.delete();
+
+        this.camera     = new PlayerControllerFPS(new Vector3f(0.f, 10.f, 20.f));
+        Context.camera  = this.camera;
+
+        this.skybox     = new Skybox();
+        this.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
+        this.shadow_map = new Shadowmap();
+
+        init_entities();
+        //load_scene_from_file(filename);
+        glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     }
 
     public void reset_colliders() {
@@ -86,12 +107,16 @@ public class Scene {
         this.light_cube.delete();
         this.skybox.delete();
         this.shadow_map.delete();
+
         for (Entity world_block : this.world_blocks) {
             world_block.delete();
         }
+        this.world_blocks.clear();
+
         for (Entity entity : this.entities) {
             entity.delete();
         }
+        this.entities.clear();
     }
 
     private void init_entities() {

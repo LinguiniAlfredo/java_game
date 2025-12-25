@@ -3,8 +3,9 @@ package org.delfino.utils;
 import org.delfino.Context;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.system.MemoryStack;
+import org.joml.Intersectionf;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -58,6 +59,28 @@ public class Collision {
         return colliding;
     }
 
+    public boolean intersects(Vector3f ray) {
+        // need min and max in world space, so add position to the dimensions
+        Vector3f min = new Vector3f(this.half_dimensions).negate().add(this.position);
+        Vector3f max = new Vector3f(this.half_dimensions).add(this.position);
+        Vector2f result = new Vector2f();
+
+        return Intersectionf.intersectRayAab(
+                Context.camera.position,
+                ray,
+                min,
+                max,
+                result
+        );
+
+//        if (hit && result.y >= 0.f) {
+//            float t_hit = result.x >= 0.f ? result.x : result.y;
+//            Vector3f hit_point = new Vector3f(ray)
+//                    .mul(t_hit)
+//                    .add(Context.camera.position);
+//        }
+    }
+
     private void calc_collision_normal(Collision other) {
         Vector3f delta = new Vector3f(this.position);
         delta.sub(other.position);
@@ -97,8 +120,8 @@ public class Collision {
     public void render() {
         this.model.identity().translate(this.position);
 
-        Matrix4f view = Context.current_scene.camera.get_view_matrix();
-        Matrix4f proj = Context.current_scene.camera.get_perspective_matrix();
+        Matrix4f view = Context.camera.get_view_matrix();
+        Matrix4f proj = Context.camera.get_perspective_matrix();
         Vector3f color = this.is_colliding ? this.red : this.green;
 
         this.shader.use();

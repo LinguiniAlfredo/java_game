@@ -47,9 +47,9 @@ public class Model {
         }
     }
 
-    public void render(Shader shader, Vector3f position, Quaternionf orientation, float scale) {
+    public void render(Shader shader, Vector3f position, Quaternionf orientation, float scale, boolean selected) {
         for (Mesh mesh : this.meshes) {
-            mesh.render(shader, position, orientation, scale);
+            mesh.render(shader, position, orientation, scale, selected);
         }
     }
 

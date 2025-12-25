@@ -1,13 +1,12 @@
 package org.delfino;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.delfino.editor.Editor;
 import org.delfino.scenes.Scene;
 import org.delfino.ui.UI;
-import org.delfino.utils.Camera;
 
 import static org.delfino.Gamemode.*;
 
-import org.delfino.utils.PlayerControllerFPS;
 import org.delfino.utils.Timer;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -25,6 +24,8 @@ public class Game {
 
     double[] mouse_x = new double[1];
     double[] mouse_y = new double[1];
+    public double prev_mouse_x = 0;
+    public double prev_mouse_y = 0;
 
     public void run() {
         init_context();
@@ -89,28 +90,31 @@ public class Game {
 
     private void toggle_editor() {
         if (Context.gamemode != PAUSED) {
-            Camera current_cam = Context.current_scene.camera;
-            Camera new_cam = null;
-            if (Context.gamemode == EDIT) {
-                Context.gamemode = GAME;
-                new_cam = new PlayerControllerFPS(current_cam);
-            } else {
+            if (Context.gamemode != EDIT) {
                 Context.gamemode = EDIT;
-                new_cam = new Camera(current_cam);
+                if (Context.editor == null) {
+                    Context.editor = new Editor();
+                }
+            } else {
+                Context.gamemode = GAME;
+                Context.current_scene.reload();
             }
-
-            Context.current_scene.camera = new_cam;
         }
     }
 
     private void handle_events(double delta_time) {
+        double x_offset, y_offset;
         glfwGetCursorPos(Context.window, mouse_x, mouse_y);
+        x_offset = mouse_x[0] - prev_mouse_x;
+        y_offset = -(mouse_y[0] - prev_mouse_y);
+        prev_mouse_x = mouse_x[0];
+        prev_mouse_y = mouse_y[0];
 
         glfwPollEvents();
 
-        Context.current_scene.camera.process_keyboard();
+        Context.camera.process_keyboard();
         if (Context.gamemode != PAUSED) {
-            Context.current_scene.camera.process_mouse(mouse_x[0], mouse_y[0], delta_time);
+            Context.camera.process_mouse_movement(x_offset, y_offset, delta_time);
         }
     }
 
@@ -177,7 +181,7 @@ public class Game {
         glfwShowWindow(Context.window);
 
         GL.createCapabilities();
-        glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
         glEnable(GL_DEPTH_TEST);
         glViewport(0, 0, Context.screen_width, Context.screen_height);
 
@@ -193,7 +197,6 @@ public class Game {
                 }
             }
         });
-
     }
 
     private void game_loop() {
@@ -218,9 +221,9 @@ public class Game {
                 }
                 case PAUSED -> render();
                 case EDIT -> {
-                    // TODO - maybe go back to scene default state and pause there
-                    Context.current_scene.camera.update(delta_time);
                     render();
+                    Context.editor.update(delta_time);
+                    Context.editor.render();
                 }
             }
 

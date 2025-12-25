@@ -55,9 +55,9 @@ public class Skybox {
         glDepthFunc(GL_LEQUAL);
         this.shader.use();
 
-        Matrix4f mat_view = Context.current_scene.camera.get_view_matrix();
+        Matrix4f mat_view = Context.camera.get_view_matrix();
         mat_view.setTranslation(0.f, 0.f, 0.f);
-        Matrix4f mat_proj = Context.current_scene.camera.get_perspective_matrix();
+        Matrix4f mat_proj = Context.camera.get_perspective_matrix();
 
         shader.set_mat4("view", mat_view);
         shader.set_mat4("projection", mat_proj);

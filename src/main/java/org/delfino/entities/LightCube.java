@@ -79,8 +79,8 @@ public class LightCube {
     public void render() {
         this.shader.use();
         mat_model.identity().translate(this.position);
-        Matrix4f mat_view = Context.current_scene.camera.get_view_matrix();
-        Matrix4f mat_proj = Context.current_scene.camera.get_perspective_matrix();
+        Matrix4f mat_view = Context.camera.get_view_matrix();
+        Matrix4f mat_proj = Context.camera.get_perspective_matrix();
         this.shader.set_mat4("model", mat_model);
         this.shader.set_mat4("view", mat_view);
         this.shader.set_mat4("projection", mat_proj);

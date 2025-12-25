@@ -10,7 +10,7 @@ import static org.delfino.Context.window;
 
 public class Camera {
 
-    final float YAW         = -90.0f;
+    final float YAW         =   0.0f;
     final float PITCH       =   0.0f;
     final float SPEED       =  10.0f;
     final float SENSITIVITY =   6.5f;
@@ -40,14 +40,30 @@ public class Camera {
     public float mouse_sensitivity;
     public float zoom;
 
-    public double prev_mouse_x = 0;
-    public double prev_mouse_y = 0;
 
     public Frustrum frustrum;
 
     public Camera(Vector3f position) {
         this.position          = position;
         this.front             = new Vector3f(0.f, 0.f, -1.f);
+        this.right             = new Vector3f();
+        this.up                = new Vector3f();
+        this.world_up          = new Vector3f(0.f, 1.f, 0.f);
+        this.trajectory        = new Vector3f();
+        this.input_vector      = new Vector3f();
+        this.yaw               = YAW;
+        this.pitch             = PITCH;
+        this.movement_speed    = SPEED;
+        this.mouse_sensitivity = SENSITIVITY;
+        this.zoom              = ZOOM;
+        this.frustrum          = new Frustrum();
+
+        update_camera_vectors();
+    }
+
+    public Camera(Vector3f position, Vector3f front) {
+        this.position          = position;
+        this.front             = front;
         this.right             = new Vector3f();
         this.up                = new Vector3f();
         this.world_up          = new Vector3f(0.f, 1.f, 0.f);
@@ -129,18 +145,12 @@ public class Camera {
         }
     }
 
-    public void process_mouse(double mouse_x, double mouse_y, double delta_time) {
-        double x_offset, y_offset;
-        x_offset = mouse_x - prev_mouse_x;
-        y_offset = -(mouse_y - prev_mouse_y);
-        prev_mouse_x = mouse_x;
-        prev_mouse_y = mouse_y;
+    public void process_mouse_movement(double mouse_x, double mouse_y, double delta_time) {
+        mouse_x *= this.mouse_sensitivity * delta_time;
+        mouse_y *= this.mouse_sensitivity * delta_time;
 
-        x_offset *= this.mouse_sensitivity * delta_time;
-        y_offset *= this.mouse_sensitivity * delta_time;
-
-        this.yaw   += x_offset;
-        this.pitch += y_offset;
+        this.yaw   += (float) mouse_x;
+        this.pitch += (float) mouse_y;
 
         if (this.pitch > 89.f) {
             this.pitch = 89.f;
