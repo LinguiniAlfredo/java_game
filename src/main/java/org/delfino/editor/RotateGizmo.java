@@ -1,18 +1,15 @@
 package org.delfino.editor;
 
+import org.delfino.Context;
+import org.delfino.utils.Collision;
 import org.delfino.utils.Utils;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL30.*;
-
-enum Axis {
-    X,
-    Y,
-    Z
-}
 
 public class RotateGizmo {
     public int         VAO, VBO;
@@ -21,16 +18,47 @@ public class RotateGizmo {
     public int         num_vertices;
     public int         resolution = 100;
     public float       radius     = 1.f;
+    public Gizmo       gizmo;
+    public Axis        selected_axis;
+    public Axis        hovered_axis;
+    public Collision   x_axis_volume;
+    public Collision   y_axis_volume;
+    public Collision   z_axis_volume;
 
-    public RotateGizmo(Vector3f position) {
+    public RotateGizmo(Gizmo gizmo, Vector3f position) {
+        this.gizmo = gizmo;
         this.position = position;
         create_vertices();
         init();
+
     }
 
     public void delete() {
         glDeleteVertexArrays(this.VAO);
         glDeleteBuffers(this.VBO);
+    }
+
+    public void render() {
+        Matrix4f mat_model = new Matrix4f().translate(this.position);
+        Matrix4f mat_view  = Context.camera.get_view_matrix();
+        Matrix4f mat_proj  = Context.camera.get_perspective_matrix();
+
+        gizmo.shader.use();
+        gizmo.shader.set_mat4("model", mat_model);
+        gizmo.shader.set_mat4("view", mat_view);
+        gizmo.shader.set_mat4("projection", mat_proj);
+
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        glBindVertexArray(this.VAO);
+        glDrawArrays(GL_LINE_LOOP, 0, this.resolution);
+        glDrawArrays(GL_LINE_LOOP, 100, this.resolution);
+        glDrawArrays(GL_LINE_LOOP, 200, this.resolution);
+        glBindVertexArray(0);
+    }
+
+    public void render_collisions() {
+
     }
 
     private void create_vertices() {

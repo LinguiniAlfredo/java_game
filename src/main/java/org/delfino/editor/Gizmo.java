@@ -2,10 +2,13 @@ package org.delfino.editor;
 
 import org.delfino.Context;
 import org.delfino.utils.Shader;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import static org.lwjgl.opengl.GL30.*;
 
+enum Axis {
+    X,
+    Y,
+    Z
+}
 
 public class Gizmo {
     public float          line_width = 3.f;
@@ -19,9 +22,9 @@ public class Gizmo {
         this.position = position;
         this.shader   = new Shader("shaders/gizmo.vert", "shaders/gizmo.frag");
 
-        this.translate_gizmo = new TranslateGizmo(position);
-        this.rotate_gizmo    = new RotateGizmo(position);
-        this.scale_gizmo     = new ScaleGizmo(position);
+        this.translate_gizmo = new TranslateGizmo(this, position);
+//        this.rotate_gizmo    = new RotateGizmo(this, position);
+//        this.scale_gizmo     = new ScaleGizmo(position);
     }
 
     public void delete() {
@@ -30,26 +33,12 @@ public class Gizmo {
     }
 
     public void render() {
-        Matrix4f mat_model = new Matrix4f().translate(this.position);
-        Matrix4f mat_view  = Context.camera.get_view_matrix();
-        Matrix4f mat_proj  = Context.camera.get_perspective_matrix();
+        this.translate_gizmo.render();
+//        this.rotate_gizmo.render();
 
-        this.shader.use();
-        this.shader.set_mat4("model", mat_model);
-        this.shader.set_mat4("view", mat_view);
-        this.shader.set_mat4("projection", mat_proj);
-
-        glClear(GL_DEPTH_BUFFER_BIT);
-
-        glLineWidth(line_width);
-        glBindVertexArray(this.translate_gizmo.VAO);
-        glDrawArrays(GL_LINES, 0, this.translate_gizmo.num_vertices);
-        glBindVertexArray(0);
-
-        glBindVertexArray(this.rotate_gizmo.VAO);
-        glDrawArrays(GL_LINE_LOOP, 0, this.rotate_gizmo.resolution);
-        glDrawArrays(GL_LINE_LOOP, 100, this.rotate_gizmo.resolution);
-        glDrawArrays(GL_LINE_LOOP, 200, this.rotate_gizmo.resolution);
-        glBindVertexArray(0);
+        if (Context.show_collisions) {
+            this.translate_gizmo.render_collisions();
+//            this.rotate_gizmo.render_collisions();
+        }
     }
 }

@@ -2,23 +2,21 @@ package org.delfino.editor;
 
 import org.delfino.Context;
 import org.delfino.entities.Entity;
-import org.delfino.utils.Camera;
 import org.joml.Vector3f;
 
-
+import java.util.ArrayList;
 
 public class Editor {
-    public Camera      camera;
-    public Gizmo       gizmo;
-    public Gridlines   gridlines;
-    public Entity      selected_object;
+    public EditorCamera camera;
+    public Gizmo        gizmo;
+    public Gridlines    gridlines;
+    public Entity       selected_object;
 
     public Editor() {
         Vector3f p     = new Vector3f(40.f, 20.f, 0.f);
         Vector3f f     = new Vector3f(0.f, 0.f, 0.f).sub(p).normalize();
         this.camera    = new EditorCamera(this, p, f);
         Context.camera = this.camera;
-
         this.gridlines = new Gridlines();
     }
 
@@ -29,6 +27,10 @@ public class Editor {
 
     public void update(double delta_time) {
         this.camera.update(delta_time);
+        if (this.gizmo != null) {
+            check_gizmo_hovered();
+        }
+
     }
 
     public void render() {
@@ -51,6 +53,43 @@ public class Editor {
         if (this.gizmo != null) {
             this.gizmo.delete();
             this.gizmo = null;
+        }
+    }
+
+    public void select() {
+        // check gizmo intersection first, if not, then check objects
+
+        ArrayList<Entity> intersecting_objects = new ArrayList<>();
+        for (Entity object : Context.current_scene.world_blocks) {
+            object.selected = false;
+            if (object.collision.intersects(this.camera.ray)) {
+                intersecting_objects.add(object);
+            }
+        }
+        float min_dist = Float.MAX_VALUE;
+        for (Entity object : intersecting_objects) {
+            float dist = object.position.distance(Context.camera.position);
+            if (dist < min_dist) {
+                min_dist = dist;
+            }
+        }
+        for (Entity object : intersecting_objects) {
+            float dist = object.position.distance(Context.camera.position);
+            if (dist == min_dist) {
+                set_selected_object(object);
+            }
+        }
+    }
+
+    private void check_gizmo_hovered() {
+        if (gizmo.translate_gizmo.x_axis_volume.intersects(this.camera.ray)) {
+            gizmo.translate_gizmo.hovered_axis = Axis.X;
+        } else if (gizmo.translate_gizmo.y_axis_volume.intersects(this.camera.ray)) {
+            gizmo.translate_gizmo.hovered_axis = Axis.Y;
+        } else if (gizmo.translate_gizmo.z_axis_volume.intersects(this.camera.ray)) {
+            gizmo.translate_gizmo.hovered_axis = Axis.Z;
+        } else {
+            gizmo.translate_gizmo.hovered_axis = null;
         }
     }
 }
