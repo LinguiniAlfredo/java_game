@@ -8,6 +8,7 @@ import org.delfino.ui.UI;
 import static org.delfino.Gamemode.*;
 
 import org.delfino.utils.Timer;
+import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
@@ -40,8 +41,8 @@ public class Game {
 
     private void init_context() {
         Context.gamemode        = GAME;
-        Context.screen_width    = 1920/2;
-        Context.screen_height   = 1080/2;
+        Context.screen_width    = 1920;
+        Context.screen_height   = 1080;
         Context.ticks_per_frame = 1000.f / 144.0f;
         Context.wireframe       = false;
         Context.show_shadow_map = false;
@@ -51,6 +52,9 @@ public class Game {
     private void close_app() {
         Context.ui.delete();
         Context.current_scene.delete();
+        if (Context.editor != null) {
+            Context.editor.delete();
+        }
 
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(Context.window);
@@ -129,6 +133,10 @@ public class Game {
         Context.current_scene.render();
         Context.ui.render();
 
+        if (Context.gamemode == EDIT) {
+            Context.editor.render();
+        }
+
         glfwSwapBuffers(Context.window);
     }
 
@@ -151,8 +159,7 @@ public class Game {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
         Context.window = glfwCreateWindow(Context.screen_width, Context.screen_height, "", NULL, NULL);
-        if (Context.window == NULL)
-            throw new RuntimeException("Failed to create the GLFW window");
+        assert Context.window != NULL;
 
         // Get the thread stack and push a new frame
         try (MemoryStack stack = stackPush()) {
@@ -221,9 +228,8 @@ public class Game {
                 }
                 case PAUSED -> render();
                 case EDIT -> {
-                    render();
                     Context.editor.update(delta_time);
-                    Context.editor.render();
+                    render();
                 }
             }
 

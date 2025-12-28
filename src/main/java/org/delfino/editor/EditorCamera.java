@@ -22,15 +22,17 @@ public class EditorCamera extends Camera {
 
     private CameraMode mode;
     private CameraMode prev_mode;
-    private Entity     selected_object;
+    private Editor     editor;
 
-    public EditorCamera(Vector3f position) {
+    public EditorCamera(Editor editor, Vector3f position) {
         super(position);
+        this.editor = editor;
         set_mode(CameraMode.SELECT);
         set_mouse_callbacks();
     }
-    public EditorCamera(Vector3f position, Vector3f front) {
+    public EditorCamera(Editor editor, Vector3f position, Vector3f front) {
         super(position, front);
+        this.editor = editor;
         set_mode(CameraMode.SELECT);
         set_mouse_callbacks();
     }
@@ -41,7 +43,7 @@ public class EditorCamera extends Camera {
         if (this.mode == CameraMode.FLY) {
             glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         } else {
-            glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
+            glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
     }
 
@@ -86,8 +88,7 @@ public class EditorCamera extends Camera {
             for (Entity object : intersecting_objects) {
                 float dist = object.position.distance(Context.camera.position);
                 if (dist == min_dist) {
-                    object.selected = true;
-                    this.selected_object = object;
+                    editor.set_selected_object(object);
                 }
             }
         }
@@ -125,4 +126,5 @@ public class EditorCamera extends Camera {
             }
         });
     }
+
 }
