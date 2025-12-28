@@ -13,6 +13,7 @@ uniform sampler2D texture1;
 uniform sampler2D shadow_map;
 
 uniform bool has_texture;
+uniform bool selected;
 
 uniform vec3 camera_pos;
 uniform vec3 light_pos;
@@ -59,6 +60,10 @@ void main()
         color = texture(texture1, fs_in.tex_coords).rgb;
     } else {
         color  = mesh_color;
+    }
+
+    if (selected) {
+        color = mix(color, vec3(1.f, 1.f, 0.f), 0.5);
     }
 
     vec3 normal = normalize(fs_in.normal);

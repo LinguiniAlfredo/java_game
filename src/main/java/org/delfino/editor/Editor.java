@@ -3,8 +3,14 @@ package org.delfino.editor;
 import org.delfino.Context;
 import org.delfino.entities.Entity;
 import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 public class Editor {
     public EditorCamera camera;
@@ -16,33 +22,39 @@ public class Editor {
         Vector3f p     = new Vector3f(40.f, 20.f, 0.f);
         Vector3f f     = new Vector3f(0.f, 0.f, 0.f).sub(p).normalize();
         this.camera    = new EditorCamera(this, p, f);
-        Context.camera = this.camera;
         this.gridlines = new Gridlines();
+        Context.camera = this.camera;
     }
 
     public void delete() {
         this.gridlines.delete();
-        this.gizmo.delete();
+        if (this.gizmo != null) {
+            this.gizmo.delete();
+        }
     }
 
     public void update(double delta_time) {
         this.camera.update(delta_time);
         if (this.gizmo != null) {
-            this.gizmo.translate_gizmo.check_hovered(this.camera.ray);
+            this.gizmo.check_hovered(this.camera.ray);
         }
     }
 
     public void render() {
-//        this.gridlines.render();
         render_gizmo();
+//        this.gridlines.render();
+//        this.entity_menu.render();
     }
 
     private void render_gizmo() {
         if (this.selected_object != null) {
             if (this.gizmo == null) {
-                this.gizmo = new Gizmo(selected_object.position);
+                this.gizmo = new TranslateGizmo(this, selected_object.position);
             }
             this.gizmo.render();
+            if (Context.show_collisions) {
+                this.gizmo.render_collisions();
+            }
         }
     }
 
@@ -58,10 +70,10 @@ public class Editor {
     public void select() {
         // check gizmo intersection first, if not, then check objects
         if (this.gizmo != null) {
-            if (this.gizmo.translate_gizmo.hovered_axis != null) {
-                this.gizmo.translate_gizmo.selected_axis = this.gizmo.translate_gizmo.hovered_axis;
+            if (this.gizmo.hovered_axis != null) {
+                this.gizmo.selected_axis = this.gizmo.hovered_axis;
+                return;
             }
-            return;
         }
 
         ArrayList<Entity> intersecting_objects = new ArrayList<>();
@@ -87,8 +99,16 @@ public class Editor {
     }
 
     public void release_gizmo() {
-        if (this.gizmo.translate_gizmo.selected_axis != null) {
-            this.gizmo.translate_gizmo.selected_axis = null;
+        if (this.gizmo != null) {
+            if (this.gizmo.selected_axis != null) {
+                this.gizmo.selected_axis = null;
+            }
+        }
+    }
+
+    public void process_mouse_movement(double mouse_x, double mouse_y, double delta_time) {
+        if (gizmo != null) {
+            this.gizmo.move_object(selected_object, mouse_x, mouse_y, delta_time);
         }
     }
 }

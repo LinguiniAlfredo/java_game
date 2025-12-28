@@ -1,97 +1,75 @@
 package org.delfino.editor;
 
 import org.delfino.Context;
-import org.delfino.utils.Collision;
+import org.delfino.entities.Entity;
 import org.delfino.utils.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL30.*;
 
-public class TranslateGizmo {
-    public int         VAO, VBO;
-    public FloatBuffer vertex_buffer;
-    public Vector3f    position;
-    public float       line_length = 2.f;
-    public int         num_vertices;
-    public Gizmo       gizmo;
-    public Axis        selected_axis;
-    public Axis        hovered_axis;
-    public Collision   x_axis_volume;
-    public Collision   y_axis_volume;
-    public Collision   z_axis_volume;
+public class TranslateGizmo extends Gizmo {
 
-    public TranslateGizmo(Gizmo gizmo, Vector3f position) {
-        this.gizmo    = gizmo;
-        this.position = position;
-
-        x_axis_volume = new Collision(
-                new Vector3f(position).add(new Vector3f(line_length / 2, 0.f, 0.f)),
-                line_length, 0.2f,
-                0.2f);
-        y_axis_volume = new Collision(
-                new Vector3f(position).add(new Vector3f(0.f, line_length / 2, 0.f)),
-                0.2f, line_length,
-                0.2f);
-        z_axis_volume = new Collision(
-                new Vector3f(position).add(new Vector3f(0.f, 0.f, line_length / 2)),
-                0.2f, 0.2f,
-                line_length);
-
-        create_vertices();
-        init();
+    public TranslateGizmo(Editor editor, Vector3f position) {
+        super(editor, position);
     }
 
-    public void delete() {
-        glDeleteVertexArrays(this.VAO);
-        glDeleteBuffers(this.VBO);
+    @Override
+    public void move_object(Entity object, double mouse_x, double mouse_y, double delta_time) {
+        if (this.selected_axis != null) {
+            mouse_x *= this.editor.camera.mouse_sensitivity * delta_time;
+            mouse_y *= this.editor.camera.mouse_sensitivity * delta_time;
+            Vector3f mouse_vector_view = new Vector3f().fma((float) mouse_x, this.editor.camera.right)
+                    .fma((float) mouse_y, this.editor.camera.up)
+                    .fma(0.f, this.editor.camera.front);
+            Vector3f translation_vector = new Vector3f();
+
+            switch(this.selected_axis) {
+                case X:
+                    translation_vector.x = mouse_vector_view.x;
+                    object.position.add(translation_vector);
+                    break;
+                case Y:
+                    translation_vector.y = mouse_vector_view.y;
+                    object.position.add(translation_vector);
+                    break;
+                case Z:
+                    translation_vector.z = mouse_vector_view.z;
+                    object.position.add(translation_vector);
+                    break;
+            }
+            this.translate_collision(translation_vector);
+        }
     }
 
+    @Override
     public void render() {
         Matrix4f mat_model = new Matrix4f().translate(this.position);
         Matrix4f mat_view  = Context.camera.get_view_matrix();
         Matrix4f mat_proj  = Context.camera.get_perspective_matrix();
 
-        gizmo.shader.use();
-        gizmo.shader.set_mat4("model", mat_model);
-        gizmo.shader.set_mat4("view", mat_view);
-        gizmo.shader.set_mat4("projection", mat_proj);
+        this.shader.use();
+        this.shader.set_mat4("model", mat_model);
+        this.shader.set_mat4("view", mat_view);
+        this.shader.set_mat4("projection", mat_proj);
 
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        glLineWidth(gizmo.line_width);
+        glLineWidth(this.line_width);
         glBindVertexArray(this.VAO);
-        gizmo.shader.set_int("hovered", hovered_axis == Axis.X || selected_axis == Axis.X ? 0 : 1);
+        this.shader.set_int("hovered", this.hovered_axis == Axis.X || this.selected_axis == Axis.X ? 0 : 1);
         glDrawArrays(GL_LINES, 0, 2);
-        gizmo.shader.set_int("hovered", hovered_axis == Axis.Y || selected_axis == Axis.Y ? 0 : 1);
+        this.shader.set_int("hovered", this.hovered_axis == Axis.Y || this.selected_axis == Axis.Y ? 0 : 1);
         glDrawArrays(GL_LINES, 2, 2);
-        gizmo.shader.set_int("hovered", hovered_axis == Axis.Z || selected_axis == Axis.Z ? 0 : 1);
+        this.shader.set_int("hovered", this.hovered_axis == Axis.Z || this.selected_axis == Axis.Z ? 0 : 1);
         glDrawArrays(GL_LINES, 4, 2);
         glBindVertexArray(0);
     }
 
-    public void render_collisions() {
-        this.x_axis_volume.render();
-        this.y_axis_volume.render();
-        this.z_axis_volume.render();
-    }
-
-    public void check_hovered(Vector3f ray) {
-        if (this.x_axis_volume.intersects(ray)) {
-            this.hovered_axis = Axis.X;
-        } else if (this.y_axis_volume.intersects(ray)) {
-            this.hovered_axis = Axis.Y;
-        } else if (this.z_axis_volume.intersects(ray)) {
-            this.gizmo.translate_gizmo.hovered_axis = Axis.Z;
-        } else {
-            this.gizmo.translate_gizmo.hovered_axis = null;
-        }
-    }
-
-    private void create_vertices() {
+    @Override
+    public void create_vertices() {
         ArrayList<Vector3f> vertices = new ArrayList<>();
         add_line_vertices(vertices, Axis.X);
         add_line_vertices(vertices, Axis.Y);
@@ -99,24 +77,6 @@ public class TranslateGizmo {
 
         this.num_vertices = vertices.size();
         this.vertex_buffer = Utils.vertices_3f_to_fb(vertices);
-    }
-
-    private void init() {
-
-        this.VAO = glGenVertexArrays();
-        this.VBO = glGenBuffers();
-
-        glBindVertexArray(this.VAO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, this.VBO);
-        glBufferData(GL_ARRAY_BUFFER, this.vertex_buffer, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, Float.BYTES * 6, 0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, Float.BYTES * 6, Float.BYTES * 3);
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-
-        glBindVertexArray(0);
     }
 
     private void add_line_vertices(ArrayList<Vector3f> vertices, Axis axis) {

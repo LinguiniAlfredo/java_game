@@ -2,6 +2,8 @@ package org.delfino;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.delfino.editor.Editor;
+import org.delfino.editor.RotateGizmo;
+import org.delfino.editor.TranslateGizmo;
 import org.delfino.scenes.Scene;
 import org.delfino.ui.UI;
 
@@ -194,13 +196,31 @@ public class Game {
 
         GLFW.glfwSetKeyCallback(Context.window, (window, key, scancode, action, mods) -> {
             if (action == GLFW.GLFW_PRESS) {
-                switch (key) {
-                    case GLFW.GLFW_KEY_TAB -> toggle_paused();
-                    case GLFW.GLFW_KEY_F1 -> toggle_wireframe();
-                    case GLFW.GLFW_KEY_F2 -> toggle_shadow_map();
-                    case GLFW.GLFW_KEY_F3 -> toggle_collision_render();
-                    case GLFW.GLFW_KEY_F5 -> toggle_editor();
-                    case GLFW.GLFW_KEY_ESCAPE -> Context.gamemode = QUIT;
+                if (Context.gamemode == GAME || Context.gamemode == EDIT) {
+                    switch (key) {
+                        case GLFW.GLFW_KEY_TAB -> toggle_paused();
+                        case GLFW.GLFW_KEY_F1 -> toggle_wireframe();
+                        case GLFW.GLFW_KEY_F2 -> toggle_shadow_map();
+                        case GLFW.GLFW_KEY_F3 -> toggle_collision_render();
+                        case GLFW.GLFW_KEY_F5 -> toggle_editor();
+                        case GLFW.GLFW_KEY_ESCAPE -> Context.gamemode = QUIT;
+                    }
+                }
+                if (Context.gamemode == EDIT) {
+                    switch (key) {
+                        case GLFW_KEY_1 -> {
+                            if (Context.editor.gizmo != null) {
+                                Context.editor.gizmo.delete();
+                                Context.editor.gizmo = new TranslateGizmo(Context.editor, Context.editor.selected_object.position);
+                            }
+                        }
+                        case GLFW_KEY_2 -> {
+                            if (Context.editor.gizmo != null) {
+                                Context.editor.gizmo.delete();
+                                Context.editor.gizmo = new RotateGizmo(Context.editor, Context.editor.selected_object.position);
+                            }
+                        }
+                    }
                 }
             }
         });

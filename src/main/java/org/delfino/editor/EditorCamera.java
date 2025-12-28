@@ -1,7 +1,6 @@
 package org.delfino.editor;
 
 import org.delfino.Context;
-import org.delfino.entities.Entity;
 import org.delfino.utils.Camera;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -59,6 +58,8 @@ public class EditorCamera extends Camera {
     public void process_mouse_movement(double mouse_x, double mouse_y, double delta_time) {
         if (this.mode == CameraMode.FLY) {
             super.process_mouse_movement(mouse_x, mouse_y, delta_time);
+        } else if (this.mode == CameraMode.SELECT) {
+            editor.process_mouse_movement(mouse_x, mouse_y, delta_time);
         }
     }
 

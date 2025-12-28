@@ -15,6 +15,6 @@ void main() {
     float grid_color = 1.0 - clamp(line, 0.0, 1.0);
 
     vec3 color = mix(vec3(0.1), vec3(0.6), grid_color);
-    //FragColor = vec4(color, 1.0);
-    FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    FragColor = vec4(color, 1.0);
+    //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

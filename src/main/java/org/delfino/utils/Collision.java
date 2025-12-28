@@ -13,17 +13,17 @@ import java.util.ArrayList;
 import static org.lwjgl.opengl.GL30.*;
 
 public class Collision {
-    int                 VAO, VBO;
-    Vector3f            position;
-    Vector3f            half_dimensions;
-    Vector3f            normal;
-    ArrayList<Vector3f> vertices;
-    FloatBuffer         vertex_buffer;
-    Shader              shader;
-    boolean             is_colliding;
-    Matrix4f            model = new Matrix4f();
-    final Vector3f      red   = new Vector3f(1.f, 0.f, 0.f);
-    final Vector3f      green = new Vector3f(0.f, 1.f, 0.f);
+    public int                 VAO, VBO;
+    public Vector3f            position;
+    public Vector3f            half_dimensions;
+    public Vector3f            normal;
+    public ArrayList<Vector3f> vertices;
+    public FloatBuffer         vertex_buffer;
+    public Shader              shader;
+    public boolean             is_colliding;
+    public Matrix4f            model = new Matrix4f();
+    public final Vector3f      red   = new Vector3f(1.f, 0.f, 0.f);
+    public final Vector3f      green = new Vector3f(0.f, 1.f, 0.f);
 
 
     public Collision(Vector3f position, float width, float height, float depth) {
