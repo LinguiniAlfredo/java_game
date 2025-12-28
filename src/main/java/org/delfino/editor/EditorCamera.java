@@ -99,6 +99,7 @@ public class EditorCamera extends Camera {
             }
             if (action == GLFW_RELEASE) {
                 switch (key) {
+                    case GLFW_MOUSE_BUTTON_1 -> editor.release_gizmo();
                     case GLFW_MOUSE_BUTTON_2 -> {
                         set_mode(CameraMode.SELECT);
                         this.input_vector.set(0);

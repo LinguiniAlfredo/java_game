@@ -64,11 +64,11 @@ public class TranslateGizmo {
 
         glLineWidth(gizmo.line_width);
         glBindVertexArray(this.VAO);
-        gizmo.shader.set_int("hovered", hovered_axis == Axis.X ? 0 : 1);
+        gizmo.shader.set_int("hovered", hovered_axis == Axis.X || selected_axis == Axis.X ? 0 : 1);
         glDrawArrays(GL_LINES, 0, 2);
-        gizmo.shader.set_int("hovered", hovered_axis == Axis.Y ? 0 : 1);
+        gizmo.shader.set_int("hovered", hovered_axis == Axis.Y || selected_axis == Axis.Y ? 0 : 1);
         glDrawArrays(GL_LINES, 2, 2);
-        gizmo.shader.set_int("hovered", hovered_axis == Axis.Z ? 0 : 1);
+        gizmo.shader.set_int("hovered", hovered_axis == Axis.Z || selected_axis == Axis.Z ? 0 : 1);
         glDrawArrays(GL_LINES, 4, 2);
         glBindVertexArray(0);
     }
@@ -77,6 +77,18 @@ public class TranslateGizmo {
         this.x_axis_volume.render();
         this.y_axis_volume.render();
         this.z_axis_volume.render();
+    }
+
+    public void check_hovered(Vector3f ray) {
+        if (this.x_axis_volume.intersects(ray)) {
+            this.hovered_axis = Axis.X;
+        } else if (this.y_axis_volume.intersects(ray)) {
+            this.hovered_axis = Axis.Y;
+        } else if (this.z_axis_volume.intersects(ray)) {
+            this.gizmo.translate_gizmo.hovered_axis = Axis.Z;
+        } else {
+            this.gizmo.translate_gizmo.hovered_axis = null;
+        }
     }
 
     private void create_vertices() {

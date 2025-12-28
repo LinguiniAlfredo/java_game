@@ -28,9 +28,8 @@ public class Editor {
     public void update(double delta_time) {
         this.camera.update(delta_time);
         if (this.gizmo != null) {
-            check_gizmo_hovered();
+            this.gizmo.translate_gizmo.check_hovered(this.camera.ray);
         }
-
     }
 
     public void render() {
@@ -58,6 +57,12 @@ public class Editor {
 
     public void select() {
         // check gizmo intersection first, if not, then check objects
+        if (this.gizmo != null) {
+            if (this.gizmo.translate_gizmo.hovered_axis != null) {
+                this.gizmo.translate_gizmo.selected_axis = this.gizmo.translate_gizmo.hovered_axis;
+            }
+            return;
+        }
 
         ArrayList<Entity> intersecting_objects = new ArrayList<>();
         for (Entity object : Context.current_scene.world_blocks) {
@@ -81,15 +86,9 @@ public class Editor {
         }
     }
 
-    private void check_gizmo_hovered() {
-        if (gizmo.translate_gizmo.x_axis_volume.intersects(this.camera.ray)) {
-            gizmo.translate_gizmo.hovered_axis = Axis.X;
-        } else if (gizmo.translate_gizmo.y_axis_volume.intersects(this.camera.ray)) {
-            gizmo.translate_gizmo.hovered_axis = Axis.Y;
-        } else if (gizmo.translate_gizmo.z_axis_volume.intersects(this.camera.ray)) {
-            gizmo.translate_gizmo.hovered_axis = Axis.Z;
-        } else {
-            gizmo.translate_gizmo.hovered_axis = null;
+    public void release_gizmo() {
+        if (this.gizmo.translate_gizmo.selected_axis != null) {
+            this.gizmo.translate_gizmo.selected_axis = null;
         }
     }
 }
