@@ -47,13 +47,13 @@ public class Model {
         }
     }
 
-    public void render(Shader shader, Vector3f position, Quaternionf orientation, float scale, boolean selected) {
+    public void render(Shader shader, Vector3f position, Quaternionf orientation, Vector3f scale, boolean selected) {
         for (Mesh mesh : this.meshes) {
             mesh.render(shader, position, orientation, scale, selected);
         }
     }
 
-    public void render_shadow_map(Shader shadow_map_shader, Vector3f position, Quaternionf orientation, float scale) {
+    public void render_shadow_map(Shader shadow_map_shader, Vector3f position, Quaternionf orientation, Vector3f scale) {
         for (Mesh mesh : this.meshes) {
             mesh.render_shadow_map(shadow_map_shader, position, orientation, scale);
         }

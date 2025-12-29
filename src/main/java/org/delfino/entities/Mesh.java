@@ -34,7 +34,7 @@ public class Mesh {
         init();
     }
 
-    public void render(Shader shader, Vector3f position, Quaternionf orientation, float scale, boolean selected) {
+    public void render(Shader shader, Vector3f position, Quaternionf orientation, Vector3f scale, boolean selected) {
         shader.use();
         shader.set_int("shadow_map", 0);
         shader.set_int("texture1", 1);
@@ -67,7 +67,7 @@ public class Mesh {
         glBindVertexArray(0);
     }
 
-    public void render_shadow_map(Shader shadow_map_shader, Vector3f position, Quaternionf orientation, float scale) {
+    public void render_shadow_map(Shader shadow_map_shader, Vector3f position, Quaternionf orientation, Vector3f scale) {
         mat_model.identity().scale(scale).translate(position).rotate(orientation);
 
         shadow_map_shader.set_mat4("model", mat_model);

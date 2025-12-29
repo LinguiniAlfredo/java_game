@@ -3,14 +3,8 @@ package org.delfino.editor;
 import org.delfino.Context;
 import org.delfino.entities.Entity;
 import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
-
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 public class Editor {
     public EditorCamera camera;
@@ -108,7 +102,15 @@ public class Editor {
 
     public void process_mouse_movement(double mouse_x, double mouse_y, double delta_time) {
         if (gizmo != null) {
-            this.gizmo.move_object(selected_object, mouse_x, mouse_y, delta_time);
+            this.gizmo.transform_object(selected_object, mouse_x, mouse_y, delta_time);
+        }
+    }
+
+    public void find_object() {
+        if (this.selected_object != null && this.camera.mode == CameraMode.SELECT) {
+            Vector3f object_position = new Vector3f(this.selected_object.position);
+            this.camera.position = object_position.sub(new Vector3f(10.f, 10.f, -10.f));
+            this.camera.look_at(object_position);
         }
     }
 }

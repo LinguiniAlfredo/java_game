@@ -26,8 +26,8 @@ float shadow_calculation(vec4 frag_pos_light_space)
     float closest_depth = texture(shadow_map, proj_coords.xy).r;
     float current_depth = proj_coords.z;
 
-    vec3 normal = normalize(fs_in.normal);
-    vec3 light_dir = normalize(light_pos - fs_in.frag_pos);
+    //vec3 normal = normalize(fs_in.normal);
+    //vec3 light_dir = normalize(light_pos - fs_in.frag_pos);
     //float bias = max(0.05 * (1.0 - dot(normal, light_dir)), 0.005);
     float bias = 0.001;
 

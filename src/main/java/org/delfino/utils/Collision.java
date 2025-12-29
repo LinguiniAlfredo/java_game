@@ -72,13 +72,32 @@ public class Collision {
                 max,
                 result
         );
+    }
 
-//        if (hit && result.y >= 0.f) {
-//            float t_hit = result.x >= 0.f ? result.x : result.y;
-//            Vector3f hit_point = new Vector3f(ray)
-//                    .mul(t_hit)
-//                    .add(Context.camera.position);
-//        }
+    public Vector3f get_intersection(Vector3f ray) {
+        // need min and max in world space, so add position to the dimensions
+        Vector3f min = new Vector3f(this.half_dimensions).negate().add(this.position);
+        Vector3f max = new Vector3f(this.half_dimensions).add(this.position);
+        Vector2f result = new Vector2f();
+        Vector3f hit_point = new Vector3f();
+
+        boolean hit = Intersectionf.intersectRayAab(
+                Context.camera.position,
+                ray,
+                min,
+                max,
+                result
+        );
+
+        if (hit && result.y >= 0.f) {
+            float t_hit = result.x >= 0.f ? result.x : result.y;
+            hit_point = new Vector3f(ray)
+                    .mul(t_hit)
+                    .add(Context.camera.position);
+        }
+
+        return hit_point;
+
     }
 
     private void calc_collision_normal(Collision other) {

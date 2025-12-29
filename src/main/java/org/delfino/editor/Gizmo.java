@@ -38,19 +38,7 @@ public class Gizmo {
         this.position = position;
         this.shader   = new Shader("shaders/gizmo.vert", "shaders/gizmo.frag");
 
-        this.x_axis_volume = new Collision(
-                new Vector3f(position).add(new Vector3f(line_length / 2, 0.f, 0.f)),
-                line_length, 0.2f,
-                0.2f);
-        this.y_axis_volume = new Collision(
-                new Vector3f(position).add(new Vector3f(0.f, line_length / 2, 0.f)),
-                0.2f, line_length,
-                0.2f);
-        this.z_axis_volume = new Collision(
-                new Vector3f(position).add(new Vector3f(0.f, 0.f, line_length / 2)),
-                0.2f, 0.2f,
-                line_length);
-
+        create_collisions();
         create_vertices();
         init();
     }
@@ -69,7 +57,7 @@ public class Gizmo {
     }
 
 
-    public void move_object(Entity object, double mouse_x, double mouse_y, double delta_time) {
+    public void transform_object(Entity object, double mouse_x, double mouse_y, double delta_time) {
         // To be overridden in implementations
     }
 
@@ -98,6 +86,10 @@ public class Gizmo {
     }
 
     public void create_vertices() {
+        // To be overridden in implementations
+    }
+
+    public void create_collisions() {
         // To be overridden in implementations
     }
 

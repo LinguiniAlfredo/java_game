@@ -2,6 +2,7 @@ package org.delfino.editor;
 
 import org.delfino.Context;
 import org.delfino.entities.Entity;
+import org.delfino.utils.Collision;
 import org.delfino.utils.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -17,7 +18,7 @@ public class RotateGizmo extends Gizmo {
     }
 
     @Override
-    public void move_object(Entity object, double mouse_x, double mouse_y, double delta_time) {
+    public void transform_object(Entity object, double mouse_x, double mouse_y, double delta_time) {
         if (selected_axis != null) {
             mouse_x *= this.editor.camera.mouse_sensitivity * delta_time;
             mouse_y *= this.editor.camera.mouse_sensitivity * delta_time;
@@ -27,13 +28,13 @@ public class RotateGizmo extends Gizmo {
 
             switch (this.selected_axis) {
                 case X:
-                    object.position.add(new Vector3f(mouse_vector_view.x, 0.f, 0.f));
+                    object.orientation.rotateAxis((float)Math.toRadians(mouse_vector_view.x), 1.f, 0.f, 0.f);
                     break;
                 case Y:
-                    object.position.add(new Vector3f(0.f, mouse_vector_view.y, 0.f));
+                    object.orientation.rotateAxis((float)Math.toRadians(mouse_vector_view.y), 0.f, 1.f, 0.f);
                     break;
                 case Z:
-                    object.position.add(new Vector3f(0.f, 0.f, mouse_vector_view.z));
+                    object.orientation.rotateAxis((float)Math.toRadians(mouse_vector_view.z), 0.f, 0.f, 1.f);
                     break;
             }
         }
@@ -53,8 +54,11 @@ public class RotateGizmo extends Gizmo {
         glClear(GL_DEPTH_BUFFER_BIT);
 
         glBindVertexArray(this.VAO);
+        this.shader.set_int("hovered", this.hovered_axis == Axis.X || this.selected_axis == Axis.X ? 1 : 0);
         glDrawArrays(GL_LINE_LOOP, 0,   this.circle_resolution);
+        this.shader.set_int("hovered", this.hovered_axis == Axis.Y || this.selected_axis == Axis.Y ? 1 : 0);
         glDrawArrays(GL_LINE_LOOP, 100, this.circle_resolution);
+        this.shader.set_int("hovered", this.hovered_axis == Axis.Z || this.selected_axis == Axis.Z ? 1 : 0);
         glDrawArrays(GL_LINE_LOOP, 200, this.circle_resolution);
         glBindVertexArray(0);
     }
@@ -69,6 +73,40 @@ public class RotateGizmo extends Gizmo {
 
         this.num_vertices = vertices.size();
         this.vertex_buffer = Utils.vertices_3f_to_fb(vertices);
+    }
+
+    @Override
+    public void create_collisions() {
+        float circle_diameter = this.circle_radius * 2;
+        this.x_axis_volume = new Collision(
+                new Vector3f(this.position),
+                0.2f, circle_diameter, circle_diameter);
+        this.y_axis_volume = new Collision(
+                new Vector3f(this.position),
+                circle_diameter, 0.2f, circle_diameter);
+        this.z_axis_volume = new Collision(
+                new Vector3f(this.position),
+                circle_diameter, circle_diameter, 0.2f);
+    }
+
+    @Override
+    public void check_hovered(Vector3f ray) {
+        Vector3f x_intersection = this.x_axis_volume.get_intersection(ray);
+        Vector3f y_intersection = this.y_axis_volume.get_intersection(ray);
+        Vector3f z_intersection = this.z_axis_volume.get_intersection(ray);
+
+        if (x_intersection.distance(this.editor.selected_object.position) >= this.circle_radius - 0.2 &&
+            x_intersection.distance(this.editor.selected_object.position) <= this.circle_radius + 0.2) {
+            this.hovered_axis = Axis.X;
+        } else if (y_intersection.distance(this.editor.selected_object.position) >= this.circle_radius - 0.2 &&
+            y_intersection.distance(this.editor.selected_object.position) <= this.circle_radius + 0.2) {
+            this.hovered_axis = Axis.Y;
+        } else if (z_intersection.distance(this.editor.selected_object.position) >= this.circle_radius - 0.2 &&
+            z_intersection.distance(this.editor.selected_object.position) <= this.circle_radius + 0.2) {
+            this.hovered_axis = Axis.Z;
+        } else {
+            this.hovered_axis = null;
+        }
     }
 
     private void add_circle_vertices(ArrayList<Vector3f>vertices, Axis axis) {

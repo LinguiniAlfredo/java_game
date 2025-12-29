@@ -13,13 +13,14 @@ import static org.lwjgl.glfw.GLFW.*;
 
 enum CameraMode {
     SELECT,
-    FLY
+    FLY,
+    ORBIT
 }
 
 public class EditorCamera extends Camera {
 
-    private CameraMode mode;
-    private CameraMode prev_mode;
+    public CameraMode mode;
+    public CameraMode prev_mode;
     private Editor     editor;
     public  Vector3f   ray;
 
@@ -56,10 +57,14 @@ public class EditorCamera extends Camera {
 
     @Override
     public void process_mouse_movement(double mouse_x, double mouse_y, double delta_time) {
-        if (this.mode == CameraMode.FLY) {
-            super.process_mouse_movement(mouse_x, mouse_y, delta_time);
-        } else if (this.mode == CameraMode.SELECT) {
-            editor.process_mouse_movement(mouse_x, mouse_y, delta_time);
+        switch (this.mode) {
+            case FLY:
+                super.process_mouse_movement(mouse_x, mouse_y, delta_time);
+                break;
+            case SELECT:
+                editor.process_mouse_movement(mouse_x, mouse_y, delta_time);
+                break;
+            case ORBIT:
         }
     }
 
@@ -95,7 +100,13 @@ public class EditorCamera extends Camera {
             if (action == GLFW_PRESS) {
                 switch (key) {
                     case GLFW_MOUSE_BUTTON_1 -> editor.select();
-                    case GLFW_MOUSE_BUTTON_2 -> set_mode(CameraMode.FLY);
+                    case GLFW_MOUSE_BUTTON_2 -> {
+                        if (mods == GLFW_MOD_ALT) {
+                            set_mode(CameraMode.ORBIT);
+                        } else {
+                            set_mode(CameraMode.FLY);
+                        }
+                    }
                 }
             }
             if (action == GLFW_RELEASE) {

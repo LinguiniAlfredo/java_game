@@ -2,6 +2,7 @@ package org.delfino.editor;
 
 import org.delfino.Context;
 import org.delfino.entities.Entity;
+import org.delfino.utils.Collision;
 import org.delfino.utils.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -17,7 +18,12 @@ public class TranslateGizmo extends Gizmo {
     }
 
     @Override
-    public void move_object(Entity object, double mouse_x, double mouse_y, double delta_time) {
+    public void delete() {
+        super.delete();
+    }
+
+    @Override
+    public void transform_object(Entity object, double mouse_x, double mouse_y, double delta_time) {
         if (this.selected_axis != null) {
             mouse_x *= this.editor.camera.mouse_sensitivity * delta_time;
             mouse_y *= this.editor.camera.mouse_sensitivity * delta_time;
@@ -28,15 +34,15 @@ public class TranslateGizmo extends Gizmo {
 
             switch(this.selected_axis) {
                 case X:
-                    translation_vector.x = mouse_vector_view.x;
+                    translation_vector.x = mouse_vector_view.x / 2;
                     object.position.add(translation_vector);
                     break;
                 case Y:
-                    translation_vector.y = mouse_vector_view.y;
+                    translation_vector.y = mouse_vector_view.y / 2;
                     object.position.add(translation_vector);
                     break;
                 case Z:
-                    translation_vector.z = mouse_vector_view.z;
+                    translation_vector.z = mouse_vector_view.z / 2;
                     object.position.add(translation_vector);
                     break;
             }
@@ -59,13 +65,30 @@ public class TranslateGizmo extends Gizmo {
 
         glLineWidth(this.line_width);
         glBindVertexArray(this.VAO);
-        this.shader.set_int("hovered", this.hovered_axis == Axis.X || this.selected_axis == Axis.X ? 0 : 1);
+        this.shader.set_int("hovered", this.hovered_axis == Axis.X || this.selected_axis == Axis.X ? 1 : 0);
         glDrawArrays(GL_LINES, 0, 2);
-        this.shader.set_int("hovered", this.hovered_axis == Axis.Y || this.selected_axis == Axis.Y ? 0 : 1);
+        this.shader.set_int("hovered", this.hovered_axis == Axis.Y || this.selected_axis == Axis.Y ? 1 : 0);
         glDrawArrays(GL_LINES, 2, 2);
-        this.shader.set_int("hovered", this.hovered_axis == Axis.Z || this.selected_axis == Axis.Z ? 0 : 1);
+        this.shader.set_int("hovered", this.hovered_axis == Axis.Z || this.selected_axis == Axis.Z ? 1 : 0);
         glDrawArrays(GL_LINES, 4, 2);
         glBindVertexArray(0);
+    }
+
+    @Override
+    public void create_collisions() {
+        this.x_axis_volume = new Collision(
+                new Vector3f(position).add(new Vector3f(line_length / 2, 0.f, 0.f)),
+                line_length, 0.2f,
+                0.2f);
+        this.y_axis_volume = new Collision(
+                new Vector3f(position).add(new Vector3f(0.f, line_length / 2, 0.f)),
+                0.2f, line_length,
+                0.2f);
+        this.z_axis_volume = new Collision(
+                new Vector3f(position).add(new Vector3f(0.f, 0.f, line_length / 2)),
+                0.2f, 0.2f,
+                line_length);
+
     }
 
     @Override

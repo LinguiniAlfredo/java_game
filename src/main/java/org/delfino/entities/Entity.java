@@ -15,10 +15,10 @@ public class Entity {
     public Vector3f    target_position;
     public Quaternionf orientation;
     public Quaternionf target_orientation;
-    public float       scale;
+    public Vector3f    scale;
     public boolean     selected = false;
 
-    public Entity(String filename, Vector3f position, Quaternionf orientation, float scale, String texture) {
+    public Entity(String filename, Vector3f position, Quaternionf orientation, Vector3f scale, String texture) {
         this.position           = position;
         this.target_position    = position;
         this.orientation        = orientation;

@@ -180,4 +180,11 @@ public class Camera {
                 .fma(input_vector.z, front);
     }
 
+    public void look_at(Vector3f target_position) {
+        Vector3f cam_position = new Vector3f(this.position);
+        Vector3f direction = target_position.sub(cam_position).normalize();
+        this.front.set(direction);
+        update_camera_vectors();
+    }
+
 }

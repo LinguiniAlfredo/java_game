@@ -3,6 +3,7 @@ package org.delfino;
 import org.apache.commons.lang3.SystemUtils;
 import org.delfino.editor.Editor;
 import org.delfino.editor.RotateGizmo;
+import org.delfino.editor.ScaleGizmo;
 import org.delfino.editor.TranslateGizmo;
 import org.delfino.scenes.Scene;
 import org.delfino.ui.UI;
@@ -220,6 +221,13 @@ public class Game {
                                 Context.editor.gizmo = new RotateGizmo(Context.editor, Context.editor.selected_object.position);
                             }
                         }
+                        case GLFW_KEY_3 -> {
+                            if (Context.editor.gizmo != null) {
+                                Context.editor.gizmo.delete();
+                                Context.editor.gizmo = new ScaleGizmo(Context.editor, Context.editor.selected_object.position);
+                            }
+                        }
+                        case GLFW_KEY_F -> Context.editor.find_object();
                     }
                 }
             }
