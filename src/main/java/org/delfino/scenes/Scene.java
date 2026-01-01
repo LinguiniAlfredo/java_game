@@ -26,7 +26,6 @@ public class Scene {
     public Camera            camera;
     public Skybox            skybox;
     public LightCube         light_cube;
-    public ArrayList<Entity> world_blocks = new ArrayList<>();
     public ArrayList<Entity> entities = new ArrayList<>();
     public Shadowmap         shadow_map;
 
@@ -38,7 +37,7 @@ public class Scene {
         this.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
         this.shadow_map = new Shadowmap();
 
-        init_entities();
+        init();
         glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 //        load_scene_from_file(filename);
     }
@@ -53,16 +52,13 @@ public class Scene {
         this.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
         this.shadow_map = new Shadowmap();
 
-        init_entities();
+        init();
         //load_scene_from_file(filename);
         glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     }
 
     public void reset_colliders() {
-        for (Entity world_block : this.world_blocks) {
-            world_block.collision.reset();
-        }
         for (Entity entity : this.entities) {
             entity.collision.reset();
         }
@@ -81,13 +77,6 @@ public class Scene {
     public void render() {
         this.shadow_map.do_pass();
         this.light_cube.render();
-
-        for (Entity world_block : this.world_blocks) {
-            world_block.render();
-            if (Context.show_collisions) {
-                world_block.render_collider();
-            }
-        }
 
         for (Entity entity : this.entities) {
             entity.render();
@@ -108,15 +97,21 @@ public class Scene {
         this.skybox.delete();
         this.shadow_map.delete();
 
-        for (Entity world_block : this.world_blocks) {
-            world_block.delete();
-        }
-        this.world_blocks.clear();
-
         for (Entity entity : this.entities) {
             entity.delete();
         }
         this.entities.clear();
+    }
+
+    private void init() {
+        this.entities.add(new Cube(this, new Vector3f(0, 0, 0)));
+        this.entities.add(new Cube(this, new Vector3f(5, 0, 0)));
+        this.entities.add(new Cube(this, new Vector3f(0, 5, 0)));
+        this.entities.add(new Cube(this, new Vector3f(0, 0, 5)));
+        this.entities.add(new Cube(this, new Vector3f(-5, 0, 0)));
+        this.entities.add(new Cube(this, new Vector3f(0, -5, 0)));
+        this.entities.add(new Cube(this, new Vector3f(0, 0, -5)));
+
     }
 
     private void init_entities() {
@@ -124,28 +119,28 @@ public class Scene {
             for (int j = 1; j < 20; j+=2) {
                 float x = (float)i;
                 float z = (float)j;
-                this.world_blocks.add(new Cube(new Vector3f(x, 0.f, z)));
-                this.world_blocks.add(new Cube(new Vector3f(-x, 0.f, -z)));
-                this.world_blocks.add(new Cube(new Vector3f(x, 0.f, -z)));
-                this.world_blocks.add(new Cube(new Vector3f(-x, 0.f, z)));
+                this.entities.add(new Cube(this, new Vector3f(x, 0.f, z)));
+                this.entities.add(new Cube(this, new Vector3f(-x, 0.f, -z)));
+                this.entities.add(new Cube(this, new Vector3f(x, 0.f, -z)));
+                this.entities.add(new Cube(this, new Vector3f(-x, 0.f, z)));
 
                 if (x == 9) {
-                    this.world_blocks.add(new Cube(new Vector3f(x, 2.f, z)));
-                    this.world_blocks.add(new Cube(new Vector3f(-x, 2.f, -z)));
-                    this.world_blocks.add(new Cube(new Vector3f(-x, 4.f, -z)));
-                    this.world_blocks.add(new Cube(new Vector3f(-x, 6.f, -z)));
+                    this.entities.add(new Cube(this, new Vector3f(x, 2.f, z)));
+                    this.entities.add(new Cube(this, new Vector3f(-x, 2.f, -z)));
+                    this.entities.add(new Cube(this, new Vector3f(-x, 4.f, -z)));
+                    this.entities.add(new Cube(this, new Vector3f(-x, 6.f, -z)));
                 }
                 if (z == 9) {
-                    this.world_blocks.add(new Cube(new Vector3f(x, 2.f, z)));
-                    this.world_blocks.add(new Cube(new Vector3f(-x, 2.f, -z)));
+                    this.entities.add(new Cube(this, new Vector3f(x, 2.f, z)));
+                    this.entities.add(new Cube(this, new Vector3f(-x, 2.f, -z)));
                 }
             }
         }
-        this.world_blocks.add(new Cube(new Vector3f(0.f, 4.f, 0.f)));
-        this.world_blocks.add(new Cube(new Vector3f(-5.f, 2.f, 5.f)));
+        this.entities.add(new Cube(this, new Vector3f(0.f, 4.f, 0.f)));
+        this.entities.add(new Cube(this, new Vector3f(-5.f, 2.f, 5.f)));
 
-        this.world_blocks.add(new Cube(new Vector3f(-17.f, 2.f, 19.f)));
-        this.world_blocks.add(new Cube(new Vector3f(-19.f, 2.f, 17.f)));
+        this.entities.add(new Cube(this, new Vector3f(-17.f, 2.f, 19.f)));
+        this.entities.add(new Cube(this, new Vector3f(-19.f, 2.f, 17.f)));
     }
 
     private void load_scene_from_file(String filename) {
@@ -158,7 +153,7 @@ public class Scene {
 //                String type = obj.get("type").getAsString();
 //                switch (type) {
 //                    case "cube":
-//                        this.world_blocks.add(new Cube(position, rotation, scale));
+//                        this.entities.add(new Cube(position, rotation, scale));
 //                }
             }
 

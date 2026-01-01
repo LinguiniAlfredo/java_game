@@ -127,9 +127,6 @@ public class Shadowmap {
     }
 
     public void render_shadow_map() {
-        for (Entity world_block : Context.current_scene.world_blocks) {
-            world_block.render_shadow_map(this.shader);
-        }
         for (Entity entity : Context.current_scene.entities) {
             entity.render_shadow_map(this.shader);
         }

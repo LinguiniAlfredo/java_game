@@ -127,10 +127,10 @@ public class PlayerControllerFPS extends Camera {
     }
 
     private boolean check_for_ground() {
-        for (Entity world_block : Context.current_scene.world_blocks) {
-            if (world_block.position.y < this.position.y && this.collision.intersects(world_block.collision)){
+        for (Entity entity : Context.current_scene.entities) {
+            if (entity.position.y < this.position.y && this.collision.intersects(entity.collision)){
                 this.state = PlayerState.GROUNDED;
-                this.collision_normals.add(world_block.collision.normal);
+                this.collision_normals.add(entity.collision.normal);
             }
         }
         if (collision_normals.isEmpty()) {

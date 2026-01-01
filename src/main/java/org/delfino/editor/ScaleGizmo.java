@@ -75,6 +75,8 @@ public class ScaleGizmo extends Gizmo {
         this.shader.set_int("hovered", this.hovered_axis == Axis.Z || this.selected_axis == Axis.Z ? 1 : 0);
         glDrawArrays(GL_LINES, 4, 2);
         glBindVertexArray(0);
+
+        glLineWidth(1.f);
     }
 
     @Override

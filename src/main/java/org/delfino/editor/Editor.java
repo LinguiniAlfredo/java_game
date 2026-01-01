@@ -3,28 +3,28 @@ package org.delfino.editor;
 import imgui.ImGui;
 import imgui.type.ImString;
 import org.delfino.Context;
+import org.delfino.editor.menus.ObjectListMenu;
+import org.delfino.editor.menus.PropertiesMenu;
 import org.delfino.entities.Entity;
 import org.joml.Vector3f;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 import java.util.ArrayList;
 
 public class Editor {
-    public EditorCamera camera;
-    public Gizmo        gizmo;
-    public Gridlines    gridlines;
-    public Entity       selected_object;
-    public ImString     text_input = new ImString();
-    float[] v = new float[100];
+    public EditorCamera   camera;
+    public Gizmo          gizmo;
+    public Gridlines      gridlines;
+    public Entity         selected_object;
+    public PropertiesMenu properties_menu;
+    public ObjectListMenu object_list_menu;
 
     public Editor() {
-        Vector3f p     = new Vector3f(40.f, 20.f, 0.f);
-        Vector3f f     = new Vector3f(0.f, 0.f, 0.f).sub(p).normalize();
-        this.camera    = new EditorCamera(this, p, f);
-        this.gridlines = new Gridlines();
-        Context.camera = this.camera;
-
+        Vector3f p            = new Vector3f(40.f, 20.f, 0.f);
+        Vector3f f            = new Vector3f(0.f, 0.f, 0.f).sub(p).normalize();
+        this.camera           = new EditorCamera(this, p, f);
+        Context.camera        = this.camera;
+        this.gridlines        = new Gridlines();
+        this.object_list_menu = new ObjectListMenu(this, Context.current_scene.entities);
     }
 
     public void delete() {
@@ -42,25 +42,18 @@ public class Editor {
     }
 
     public void render() {
-        render_menu();
-        render_gizmo();
-//        this.gridlines.render();
-    }
-
-    private void render_menu() {
         Context.gui_glfw.newFrame();
         Context.gui_gl3.newFrame();
         ImGui.newFrame();
-        ImGui.begin("windwo");
 
-        ImGui.text("my text");
-        if (ImGui.button("Save")) {
-            System.out.println("saving");
+        this.object_list_menu.render();
+        if (this.selected_object != null) {
+            this.properties_menu.render();
         }
-        ImGui.inputText("label", this.text_input);
-        ImGui.sliderFloat("float", this.v, 0.f, 100.f);
 
-        ImGui.end();
+        render_gizmo();
+//        this.gridlines.render();
+
         ImGui.render();
         Context.gui_gl3.renderDrawData(ImGui.getDrawData());
     }
@@ -78,12 +71,27 @@ public class Editor {
     }
 
     public void set_selected_object(Entity object) {
+        deselect_object();
+
         object.selected = true;
         this.selected_object = object;
         if (this.gizmo != null) {
             this.gizmo.delete();
             this.gizmo = null;
         }
+        this.properties_menu = new PropertiesMenu(selected_object);
+    }
+
+    private void deselect_object() {
+        if (this.selected_object != null) {
+            this.selected_object.selected = false;
+            this.selected_object = null;
+        }
+        if (this.gizmo != null) {
+            this.gizmo.delete();
+            this.gizmo = null;
+        }
+        this.properties_menu = null;
     }
 
     public void select() {
@@ -96,12 +104,16 @@ public class Editor {
         }
 
         ArrayList<Entity> intersecting_objects = new ArrayList<>();
-        for (Entity object : Context.current_scene.world_blocks) {
+        for (Entity object : Context.current_scene.entities) {
             object.selected = false;
             if (object.collision.intersects(this.camera.ray)) {
                 intersecting_objects.add(object);
             }
         }
+        if (intersecting_objects.isEmpty()) {
+            deselect_object();
+        }
+
         float min_dist = Float.MAX_VALUE;
         for (Entity object : intersecting_objects) {
             float dist = object.position.distance(Context.camera.position);

@@ -52,6 +52,7 @@ public class RotateGizmo extends Gizmo {
         this.shader.set_mat4("projection", mat_proj);
 
         glClear(GL_DEPTH_BUFFER_BIT);
+        glLineWidth(this.line_width);
 
         glBindVertexArray(this.VAO);
         this.shader.set_int("hovered", this.hovered_axis == Axis.X || this.selected_axis == Axis.X ? 1 : 0);
@@ -61,6 +62,8 @@ public class RotateGizmo extends Gizmo {
         this.shader.set_int("hovered", this.hovered_axis == Axis.Z || this.selected_axis == Axis.Z ? 1 : 0);
         glDrawArrays(GL_LINE_LOOP, 200, this.circle_resolution);
         glBindVertexArray(0);
+
+        glLineWidth(1.f);
     }
 
     @Override

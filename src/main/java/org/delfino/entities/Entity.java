@@ -1,11 +1,17 @@
 package org.delfino.entities;
 
+import org.apache.commons.io.FilenameUtils;
+import org.delfino.Context;
+import org.delfino.scenes.Scene;
 import org.delfino.utils.Collision;
 import org.delfino.utils.Shader;
 import org.delfino.utils.Vertex;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Entity {
     public Model       model;
@@ -17,8 +23,12 @@ public class Entity {
     public Quaternionf target_orientation;
     public Vector3f    scale;
     public boolean     selected = false;
+    public String      name;
+    public Scene       scene;
 
-    public Entity(String filename, Vector3f position, Quaternionf orientation, Vector3f scale, String texture) {
+    public Entity(Scene scene, String filename, Vector3f position, Quaternionf orientation, Vector3f scale, String texture) {
+        this.scene              = scene;
+        this.name               = FilenameUtils.getBaseName(filename) + "_" + scene.entities.size();
         this.position           = position;
         this.target_position    = position;
         this.orientation        = orientation;
