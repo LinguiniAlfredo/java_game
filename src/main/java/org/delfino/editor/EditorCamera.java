@@ -11,12 +11,6 @@ import java.nio.DoubleBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-enum CameraMode {
-    SELECT,
-    FLY,
-    ORBIT
-}
-
 public class EditorCamera extends Camera {
 
     public CameraMode mode;
@@ -28,13 +22,11 @@ public class EditorCamera extends Camera {
         super(position);
         this.editor = editor;
         set_mode(CameraMode.SELECT);
-        set_mouse_callbacks();
     }
     public EditorCamera(Editor editor, Vector3f position, Vector3f front) {
         super(position, front);
         this.editor = editor;
         set_mode(CameraMode.SELECT);
-        set_mouse_callbacks();
     }
 
     @Override
@@ -90,35 +82,8 @@ public class EditorCamera extends Camera {
         return new Vector3f(tmp.x, tmp.y, tmp.z).normalize();
     }
 
-    private void set_mode(CameraMode mode) {
+    public void set_mode(CameraMode mode) {
         this.prev_mode = this.mode;
         this.mode = mode;
     }
-
-    private void set_mouse_callbacks() {
-        GLFW.glfwSetMouseButtonCallback(Context.window, (window, key, action, mods) -> {
-            if (action == GLFW_PRESS) {
-                switch (key) {
-                    case GLFW_MOUSE_BUTTON_1 -> editor.select();
-                    case GLFW_MOUSE_BUTTON_2 -> {
-                        if (mods == GLFW_MOD_ALT) {
-                            set_mode(CameraMode.ORBIT);
-                        } else {
-                            set_mode(CameraMode.FLY);
-                        }
-                    }
-                }
-            }
-            if (action == GLFW_RELEASE) {
-                switch (key) {
-                    case GLFW_MOUSE_BUTTON_1 -> editor.release_gizmo();
-                    case GLFW_MOUSE_BUTTON_2 -> {
-                        set_mode(CameraMode.SELECT);
-                        this.input_vector.set(0);
-                    }
-                }
-            }
-        });
-    }
-
 }

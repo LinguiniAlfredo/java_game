@@ -1,23 +1,24 @@
 package org.delfino;
 
+import imgui.ImGui;
+import imgui.gl3.ImGuiImplGl3;
+import imgui.glfw.ImGuiImplGlfw;
+
 import org.apache.commons.lang3.SystemUtils;
-import org.delfino.editor.Editor;
-import org.delfino.editor.RotateGizmo;
-import org.delfino.editor.ScaleGizmo;
-import org.delfino.editor.TranslateGizmo;
+import org.delfino.editor.*;
 import org.delfino.scenes.Scene;
 import org.delfino.ui.UI;
 
 import static org.delfino.Gamemode.*;
 
 import org.delfino.utils.Timer;
-import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import java.nio.*;
 
+import static org.delfino.editor.CameraMode.*;
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -110,18 +111,21 @@ public class Game {
     }
 
     private void handle_events(double delta_time) {
-        double x_offset, y_offset;
-        glfwGetCursorPos(Context.window, mouse_x, mouse_y);
-        x_offset = mouse_x[0] - prev_mouse_x;
-        y_offset = -(mouse_y[0] - prev_mouse_y);
-        prev_mouse_x = mouse_x[0];
-        prev_mouse_y = mouse_y[0];
-
         glfwPollEvents();
+        if (!ImGui.getIO().getWantCaptureMouse()) {
+            double x_offset, y_offset;
+            glfwGetCursorPos(Context.window, mouse_x, mouse_y);
+            x_offset = mouse_x[0] - prev_mouse_x;
+            y_offset = -(mouse_y[0] - prev_mouse_y);
+            prev_mouse_x = mouse_x[0];
+            prev_mouse_y = mouse_y[0];
 
-        Context.camera.process_keyboard();
-        if (Context.gamemode != PAUSED) {
-            Context.camera.process_mouse_movement(x_offset, y_offset, delta_time);
+            if (Context.gamemode != PAUSED) {
+                Context.camera.process_mouse_movement(x_offset, y_offset, delta_time);
+            }
+        }
+        if (!ImGui.getIO().getWantCaptureKeyboard()) {
+            Context.camera.process_keyboard();
         }
     }
 
@@ -195,41 +199,101 @@ public class Game {
         glEnable(GL_DEPTH_TEST);
         glViewport(0, 0, Context.screen_width, Context.screen_height);
 
+        init_imgui();
+
+        set_key_callbacks();
+        set_mouse_callbacks();
+    }
+
+    private void init_imgui() {
+        ImGui.createContext();
+        Context.gui_glfw = new ImGuiImplGlfw();
+        Context.gui_gl3  = new ImGuiImplGl3();
+        Context.gui_glfw.init(Context.window, true);
+        Context.gui_gl3.init("#version 330");
+    }
+
+    private void set_key_callbacks() {
         GLFW.glfwSetKeyCallback(Context.window, (window, key, scancode, action, mods) -> {
-            if (action == GLFW.GLFW_PRESS) {
-                if (Context.gamemode == GAME || Context.gamemode == EDIT) {
-                    switch (key) {
-                        case GLFW.GLFW_KEY_TAB -> toggle_paused();
-                        case GLFW.GLFW_KEY_F1 -> toggle_wireframe();
-                        case GLFW.GLFW_KEY_F2 -> toggle_shadow_map();
-                        case GLFW.GLFW_KEY_F3 -> toggle_collision_render();
-                        case GLFW.GLFW_KEY_F5 -> toggle_editor();
-                        case GLFW.GLFW_KEY_ESCAPE -> Context.gamemode = QUIT;
+            if (!ImGui.getIO().getWantCaptureKeyboard()) {
+                if (action == GLFW.GLFW_PRESS) {
+                    if (Context.gamemode == GAME || Context.gamemode == EDIT) {
+                        switch (key) {
+                            case GLFW.GLFW_KEY_TAB -> toggle_paused();
+                            case GLFW.GLFW_KEY_F1 -> toggle_wireframe();
+                            case GLFW.GLFW_KEY_F2 -> toggle_shadow_map();
+                            case GLFW.GLFW_KEY_F3 -> toggle_collision_render();
+                            case GLFW.GLFW_KEY_F5 -> toggle_editor();
+                            case GLFW.GLFW_KEY_ESCAPE -> Context.gamemode = QUIT;
+                        }
+                    }
+                    if (Context.gamemode == EDIT) {
+                        switch (key) {
+                            case GLFW_KEY_1 -> {
+                                if (Context.editor.gizmo != null) {
+                                    Context.editor.gizmo.delete();
+                                    Context.editor.gizmo = new TranslateGizmo(Context.editor, Context.editor.selected_object.position);
+                                }
+                            }
+                            case GLFW_KEY_2 -> {
+                                if (Context.editor.gizmo != null) {
+                                    Context.editor.gizmo.delete();
+                                    Context.editor.gizmo = new RotateGizmo(Context.editor, Context.editor.selected_object.position);
+                                }
+                            }
+                            case GLFW_KEY_3 -> {
+                                if (Context.editor.gizmo != null) {
+                                    Context.editor.gizmo.delete();
+                                    Context.editor.gizmo = new ScaleGizmo(Context.editor, Context.editor.selected_object.position);
+                                }
+                            }
+                            case GLFW_KEY_F -> Context.editor.find_object();
+                        }
                     }
                 }
+            }
+        });
+    }
+
+    private void set_mouse_callbacks() {
+        GLFW.glfwSetMouseButtonCallback(Context.window, (window, button, action, mods) -> {
+            ImGui.getIO().setMouseDown(button, action == GLFW_PRESS);
+            if (!ImGui.getIO().getWantCaptureMouse()) {
                 if (Context.gamemode == EDIT) {
-                    switch (key) {
-                        case GLFW_KEY_1 -> {
-                            if (Context.editor.gizmo != null) {
-                                Context.editor.gizmo.delete();
-                                Context.editor.gizmo = new TranslateGizmo(Context.editor, Context.editor.selected_object.position);
+                    if (action == GLFW_PRESS) {
+                        switch (button) {
+                            case GLFW_MOUSE_BUTTON_1 -> Context.editor.select();
+                            case GLFW_MOUSE_BUTTON_2 -> {
+                                if (mods == GLFW_MOD_ALT) { // TODO - this is actual bitwise 0x0004
+                                    Context.editor.camera.set_mode(ORBIT);
+                                } else {
+                                    Context.editor.camera.set_mode(FLY);
+                                }
                             }
                         }
-                        case GLFW_KEY_2 -> {
-                            if (Context.editor.gizmo != null) {
-                                Context.editor.gizmo.delete();
-                                Context.editor.gizmo = new RotateGizmo(Context.editor, Context.editor.selected_object.position);
+                    }
+                    if (action == GLFW_RELEASE) {
+                        switch (button) {
+                            case GLFW_MOUSE_BUTTON_1 -> Context.editor.release_gizmo();
+                            case GLFW_MOUSE_BUTTON_2 -> {
+                                Context.editor.camera.set_mode(SELECT);
+                                Context.editor.camera.input_vector.set(0);
                             }
                         }
-                        case GLFW_KEY_3 -> {
-                            if (Context.editor.gizmo != null) {
-                                Context.editor.gizmo.delete();
-                                Context.editor.gizmo = new ScaleGizmo(Context.editor, Context.editor.selected_object.position);
-                            }
-                        }
-                        case GLFW_KEY_F -> Context.editor.find_object();
                     }
                 }
+            }
+        });
+
+        glfwSetCursorPosCallback(Context.window, (w, x, y) -> {
+            ImGui.getIO().setMousePos((float)x, (float)y);
+            if (!ImGui.getIO().getWantCaptureMouse()) {
+            }
+        });
+
+        glfwSetScrollCallback(Context.window, (w, xoff, yoff) -> {
+            ImGui.getIO().setMouseWheel((float)yoff);
+            if (!ImGui.getIO().getWantCaptureMouse()) {
             }
         });
     }

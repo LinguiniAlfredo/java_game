@@ -1,8 +1,12 @@
 package org.delfino.editor;
 
+import imgui.ImGui;
+import imgui.type.ImString;
 import org.delfino.Context;
 import org.delfino.entities.Entity;
 import org.joml.Vector3f;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 import java.util.ArrayList;
 
@@ -11,6 +15,8 @@ public class Editor {
     public Gizmo        gizmo;
     public Gridlines    gridlines;
     public Entity       selected_object;
+    public ImString     text_input = new ImString();
+    float[] v = new float[100];
 
     public Editor() {
         Vector3f p     = new Vector3f(40.f, 20.f, 0.f);
@@ -18,6 +24,7 @@ public class Editor {
         this.camera    = new EditorCamera(this, p, f);
         this.gridlines = new Gridlines();
         Context.camera = this.camera;
+
     }
 
     public void delete() {
@@ -35,9 +42,27 @@ public class Editor {
     }
 
     public void render() {
+        render_menu();
         render_gizmo();
 //        this.gridlines.render();
-//        this.entity_menu.render();
+    }
+
+    private void render_menu() {
+        Context.gui_glfw.newFrame();
+        Context.gui_gl3.newFrame();
+        ImGui.newFrame();
+        ImGui.begin("windwo");
+
+        ImGui.text("my text");
+        if (ImGui.button("Save")) {
+            System.out.println("saving");
+        }
+        ImGui.inputText("label", this.text_input);
+        ImGui.sliderFloat("float", this.v, 0.f, 100.f);
+
+        ImGui.end();
+        ImGui.render();
+        Context.gui_gl3.renderDrawData(ImGui.getDrawData());
     }
 
     private void render_gizmo() {

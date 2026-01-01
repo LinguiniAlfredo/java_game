@@ -1,5 +1,8 @@
 package org.delfino;
 
+import imgui.gl3.ImGuiImplGl3;
+import imgui.glfw.ImGuiImplGlfw;
+import imgui.lwjgl3.glfw.ImGuiImplGlfwNative;
 import org.delfino.editor.Editor;
 import org.delfino.scenes.Scene;
 import org.delfino.ui.*;
@@ -18,4 +21,6 @@ public record Context() {
     public static boolean  wireframe;
     public static boolean  show_shadow_map;
     public static boolean  show_collisions;
+    public static ImGuiImplGlfw gui_glfw;
+    public static ImGuiImplGl3 gui_gl3;
 }
