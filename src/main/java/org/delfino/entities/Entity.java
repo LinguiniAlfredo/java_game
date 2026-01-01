@@ -25,10 +25,12 @@ public class Entity {
     public boolean     selected = false;
     public String      name;
     public Scene       scene;
+    public EntityType  type;
 
-    public Entity(Scene scene, String filename, Vector3f position, Quaternionf orientation, Vector3f scale, String texture) {
+    public Entity(Scene scene, EntityType type, String filename, Vector3f position, Quaternionf orientation, Vector3f scale, String texture) {
         this.scene              = scene;
-        this.name               = FilenameUtils.getBaseName(filename) + "_" + scene.entities.size();
+        this.type               = type;
+        this.name               = get_entity_name(filename);
         this.position           = position;
         this.target_position    = position;
         this.orientation        = orientation;
@@ -93,5 +95,13 @@ public class Entity {
             }
         }
         return new Vector3f(max_x - min_x, max_y - min_y, max_z - min_z);
+    }
+
+    private String get_entity_name(String filename) {
+        String     name = FilenameUtils.getBaseName(filename);
+        EntityType type = EntityType.valueOf(name.toUpperCase());
+
+        int num_of_type = scene.entities.stream().filter(e -> e.type == type).toList().size();
+        return name + "_" + num_of_type;
     }
 }

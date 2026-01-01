@@ -1,14 +1,10 @@
 package org.delfino.scenes;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 import org.delfino.Context;
-import org.delfino.entities.Cube;
-import org.delfino.entities.Entity;
-import org.delfino.entities.LightCube;
+import org.delfino.entities.*;
 import org.delfino.renderer.Shadowmap;
 import org.delfino.renderer.Skybox;
 import org.delfino.utils.Camera;
@@ -20,6 +16,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 
+import static org.delfino.entities.EntityType.*;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Scene {
@@ -103,6 +100,16 @@ public class Scene {
         this.entities.clear();
     }
 
+    public void add_entity(EntityType type) {
+        switch (type) {
+            case CUBE:
+                this.entities.add(new Cube(this, new Vector3f(0.f, 0.f, 0.f)));
+                break;
+            case SPHERE:
+                this.entities.add(new Sphere(this, new Vector3f(0.f, 0.f, 0.f)));
+        }
+    }
+
     private void init() {
         this.entities.add(new Cube(this, new Vector3f(0, 0, 0)));
         this.entities.add(new Cube(this, new Vector3f(5, 0, 0)));
@@ -161,4 +168,5 @@ public class Scene {
             System.out.println("failed to read scene file...");
         }
     }
+
 }

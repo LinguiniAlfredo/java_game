@@ -17,6 +17,7 @@ public class Editor {
     public Entity         selected_object;
     public PropertiesMenu properties_menu;
     public ObjectListMenu object_list_menu;
+    public String[]       entity_types;
 
     public Editor() {
         Vector3f p            = new Vector3f(40.f, 20.f, 0.f);
