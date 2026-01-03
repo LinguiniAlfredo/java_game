@@ -1,7 +1,6 @@
 package org.delfino.editor;
 
 import imgui.ImGui;
-import imgui.type.ImString;
 import org.delfino.Context;
 import org.delfino.editor.menus.ObjectListMenu;
 import org.delfino.editor.menus.PropertiesMenu;
@@ -17,7 +16,7 @@ public class Editor {
     public Entity         selected_object;
     public PropertiesMenu properties_menu;
     public ObjectListMenu object_list_menu;
-    public String[]       entity_types;
+    public Compass        compass;
 
     public Editor() {
         Vector3f p            = new Vector3f(40.f, 20.f, 0.f);
@@ -26,6 +25,7 @@ public class Editor {
         Context.camera        = this.camera;
         this.gridlines        = new Gridlines();
         this.object_list_menu = new ObjectListMenu(this, Context.current_scene.entities);
+        this.compass          = new Compass(this);
     }
 
     public void delete() {
@@ -51,6 +51,7 @@ public class Editor {
         if (this.selected_object != null) {
             this.properties_menu.render();
         }
+        this.compass.render();
 
         render_gizmo();
 //        this.gridlines.render();

@@ -1,4 +1,4 @@
-package org.delfino.utils;
+package org.delfino.cameras;
 
 import org.delfino.Context;
 
@@ -39,7 +39,6 @@ public class Camera {
     public float movement_speed;
     public float mouse_sensitivity;
     public float zoom;
-
 
     public Frustrum frustrum;
 
@@ -165,11 +164,13 @@ public class Camera {
         float pitch_rad = (float) Math.toRadians(this.pitch);
         float cos_pitch = (float) Math.cos(pitch_rad);
 
-        this.front.set(
-                (float) Math.cos(yaw_rad) * cos_pitch,
-                (float) Math.sin(pitch_rad),
-                (float) Math.sin(yaw_rad) * cos_pitch
-        ).normalize();
+        if (yaw_rad != 0 || pitch_rad != 0) {
+            this.front.set(
+                    (float) Math.cos(yaw_rad) * cos_pitch,
+                    (float) Math.sin(pitch_rad),
+                    (float) Math.sin(yaw_rad) * cos_pitch
+            ).normalize();
+        }
 
         this.front.cross(this.world_up, this.right).normalize();
         this.right.cross(this.front, this.up).normalize();

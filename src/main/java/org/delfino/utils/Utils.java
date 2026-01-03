@@ -69,4 +69,12 @@ public class Utils {
             return value;
         }
     }
+
+    public static FloatBuffer append_float_buffers(FloatBuffer buf1, FloatBuffer buf2) {
+        FloatBuffer result = BufferUtils.createFloatBuffer(buf1.limit() + buf2.limit());
+        result.put(buf1);
+        result.put(buf2);
+        result.flip();
+        return result;
+    }
 }

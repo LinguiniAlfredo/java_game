@@ -8,6 +8,7 @@ import org.delfino.entities.Entity;
 import org.delfino.entities.EntityType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ObjectListMenu extends Menu {
     public ArrayList<Entity> entities;

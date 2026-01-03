@@ -18,11 +18,6 @@ public class TranslateGizmo extends Gizmo {
     }
 
     @Override
-    public void delete() {
-        super.delete();
-    }
-
-    @Override
     public void transform_object(Entity object, double mouse_x, double mouse_y, double delta_time) {
         if (this.selected_axis != null) {
             mouse_x *= this.editor.camera.mouse_sensitivity * delta_time;

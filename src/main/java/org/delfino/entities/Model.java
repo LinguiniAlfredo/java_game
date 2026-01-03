@@ -1,5 +1,6 @@
 package org.delfino.entities;
 
+import org.apache.commons.io.FilenameUtils;
 import org.delfino.utils.Shader;
 import org.delfino.utils.Texture;
 import org.delfino.utils.Vertex;
@@ -61,7 +62,7 @@ public class Model {
 
     private void load_model() {
         try (InputStream input_stream = Model.class.getClassLoader().getResourceAsStream(this.model_path)) {
-            Path temp_file = Files.createTempFile("model-", ".obj");
+            Path temp_file = Files.createTempFile("model-", FilenameUtils.getExtension(this.model_path));
             temp_file.toFile().deleteOnExit();
 
             try (BufferedOutputStream output_stream = new BufferedOutputStream(Files.newOutputStream(temp_file))) {

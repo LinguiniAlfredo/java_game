@@ -56,7 +56,6 @@ public class Gizmo {
         // To be overridden in implementations
     }
 
-
     public void transform_object(Entity object, double mouse_x, double mouse_y, double delta_time) {
         // To be overridden in implementations
     }

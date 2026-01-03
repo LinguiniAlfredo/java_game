@@ -2,11 +2,10 @@ package org.delfino;
 
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
-import imgui.lwjgl3.glfw.ImGuiImplGlfwNative;
 import org.delfino.editor.Editor;
 import org.delfino.scenes.Scene;
 import org.delfino.ui.*;
-import org.delfino.utils.Camera;
+import org.delfino.cameras.Camera;
 
 public record Context() {
     public static long     window;

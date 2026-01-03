@@ -3,7 +3,8 @@ package org.delfino.entities;
 
 public enum EntityType {
     CUBE,
-    SPHERE;
+    SPHERE,
+    PLAYER;
 
     public static String[] to_string_array() {
         EntityType[] values = EntityType.values();

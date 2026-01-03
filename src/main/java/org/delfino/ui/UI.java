@@ -2,6 +2,7 @@ package org.delfino.ui;
 
 import org.delfino.Context;
 import org.delfino.Gamemode;
+import org.delfino.cameras.FPSCamera;
 import org.delfino.utils.Shader;
 import org.delfino.utils.Utils;
 import org.joml.Matrix4f;
@@ -37,7 +38,9 @@ public class UI {
         if (Context.gamemode == Gamemode.PAUSED) {
             render_pause_menu();
         } else if (Context.gamemode == Gamemode.GAME){
-            render_crosshair();
+            if (Context.camera instanceof FPSCamera) {
+                render_crosshair();
+            }
         }
     }
 

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import static org.lwjgl.opengl.GL30.*;
 
 public class Collision {
+
     public int                 VAO, VBO;
     public Vector3f            position;
     public Vector3f            half_dimensions;
@@ -24,7 +25,6 @@ public class Collision {
     public Matrix4f            model = new Matrix4f();
     public final Vector3f      red   = new Vector3f(1.f, 0.f, 0.f);
     public final Vector3f      green = new Vector3f(0.f, 1.f, 0.f);
-
 
     public Collision(Vector3f position, float width, float height, float depth) {
         this.position        = position;

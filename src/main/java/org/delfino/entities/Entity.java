@@ -30,7 +30,7 @@ public class Entity {
     public Entity(Scene scene, EntityType type, String filename, Vector3f position, Quaternionf orientation, Vector3f scale, String texture) {
         this.scene              = scene;
         this.type               = type;
-        this.name               = get_entity_name(filename);
+        this.name               = get_entity_name();
         this.position           = position;
         this.target_position    = position;
         this.orientation        = orientation;
@@ -97,8 +97,8 @@ public class Entity {
         return new Vector3f(max_x - min_x, max_y - min_y, max_z - min_z);
     }
 
-    private String get_entity_name(String filename) {
-        String     name = FilenameUtils.getBaseName(filename);
+    private String get_entity_name() {
+        String     name = this.type.toString();
         EntityType type = EntityType.valueOf(name.toUpperCase());
 
         int num_of_type = scene.entities.stream().filter(e -> e.type == type).toList().size();

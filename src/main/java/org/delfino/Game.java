@@ -29,6 +29,7 @@ public class Game {
 
     double[] mouse_x = new double[1];
     double[] mouse_y = new double[1];
+    boolean  first_frame = true;
     public double prev_mouse_x = 0;
     public double prev_mouse_y = 0;
 
@@ -105,7 +106,10 @@ public class Game {
                 }
             } else {
                 Context.gamemode = GAME;
-                Context.current_scene.reload();
+                if (Context.current_scene != null) {
+                    Context.current_scene.delete();
+                }
+                Context.current_scene = new Scene("scenes/example_level.json");
             }
         }
     }
@@ -115,6 +119,11 @@ public class Game {
         if (!ImGui.getIO().getWantCaptureMouse()) {
             double x_offset, y_offset;
             glfwGetCursorPos(Context.window, mouse_x, mouse_y);
+            if (first_frame) {
+                prev_mouse_x = mouse_x[0];
+                prev_mouse_y = mouse_y[0];
+                first_frame = false;
+            }
             x_offset = mouse_x[0] - prev_mouse_x;
             y_offset = -(mouse_y[0] - prev_mouse_y);
             prev_mouse_x = mouse_x[0];

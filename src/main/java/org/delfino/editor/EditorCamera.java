@@ -1,10 +1,9 @@
 package org.delfino.editor;
 
 import org.delfino.Context;
-import org.delfino.utils.Camera;
+import org.delfino.cameras.Camera;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.DoubleBuffer;
@@ -15,8 +14,8 @@ public class EditorCamera extends Camera {
 
     public CameraMode mode;
     public CameraMode prev_mode;
-    private Editor     editor;
-    public  Vector3f   ray;
+    private Editor    editor;
+    public  Vector3f  ray;
 
     public EditorCamera(Editor editor, Vector3f position) {
         super(position);
