@@ -47,13 +47,13 @@ public class EditorCamera extends Camera {
     }
 
     @Override
-    public void process_mouse_movement(double mouse_x, double mouse_y, double delta_time) {
+    public void process_mouse_movement(double offset_x, double offset_y, double delta_time) {
         switch (this.mode) {
             case FLY:
-                super.process_mouse_movement(mouse_x, mouse_y, delta_time);
+                super.process_mouse_movement(offset_x, offset_y, delta_time);
                 break;
             case SELECT:
-                editor.process_mouse_movement(mouse_x, mouse_y, delta_time);
+                editor.process_mouse_movement(offset_x, offset_y, delta_time);
                 break;
             case ORBIT:
         }

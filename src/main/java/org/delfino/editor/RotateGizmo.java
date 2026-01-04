@@ -5,10 +5,12 @@ import org.delfino.entities.Entity;
 import org.delfino.utils.Collision;
 import org.delfino.utils.Utils;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 
+import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 import static org.lwjgl.opengl.GL30.*;
 
 public class RotateGizmo extends Gizmo {
@@ -18,25 +20,22 @@ public class RotateGizmo extends Gizmo {
     }
 
     @Override
-    public void transform_object(Entity object, double mouse_x, double mouse_y, double delta_time) {
+    public void transform_object(Entity object, double offset_x, double offset_y, double delta_time) {
         if (selected_axis != null) {
-            mouse_x *= this.editor.camera.mouse_sensitivity * delta_time;
-            mouse_y *= this.editor.camera.mouse_sensitivity * delta_time;
-            Vector3f mouse_vector_view = new Vector3f().fma((float) mouse_x, this.editor.camera.right)
-                    .fma((float) mouse_y, this.editor.camera.up)
+            offset_x *= this.editor.camera.mouse_sensitivity * delta_time;
+            offset_y *= this.editor.camera.mouse_sensitivity * delta_time;
+            Vector3f mouse_vector_view = new Vector3f().fma((float) offset_x, this.editor.camera.right)
+                    .fma((float) offset_y, this.editor.camera.up)
                     .fma(0.f, this.editor.camera.front);
 
+            Vector3f axis = new Vector3f();
             switch (this.selected_axis) {
-                case X:
-                    object.orientation.rotateAxis((float)Math.toRadians(mouse_vector_view.x), 1.f, 0.f, 0.f);
-                    break;
-                case Y:
-                    object.orientation.rotateAxis((float)Math.toRadians(mouse_vector_view.y), 0.f, 1.f, 0.f);
-                    break;
-                case Z:
-                    object.orientation.rotateAxis((float)Math.toRadians(mouse_vector_view.z), 0.f, 0.f, 1.f);
-                    break;
+                case X -> axis.set(1.f, 0.f, 0.f);
+                case Y -> axis.set(0.f, 1.f, 0.f);
+                case Z -> axis.set(0.f, 0.f, 1.f);
             }
+            float angle_view = (float) Math.acos(mouse_vector_view.dot(axis));
+            object.orientation.rotateAxis(angle_view, axis);
         }
     }
 

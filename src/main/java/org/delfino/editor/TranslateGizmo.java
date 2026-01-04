@@ -18,12 +18,12 @@ public class TranslateGizmo extends Gizmo {
     }
 
     @Override
-    public void transform_object(Entity object, double mouse_x, double mouse_y, double delta_time) {
+    public void transform_object(Entity object, double offset_x, double offset_y, double delta_time) {
         if (this.selected_axis != null) {
-            mouse_x *= this.editor.camera.mouse_sensitivity * delta_time;
-            mouse_y *= this.editor.camera.mouse_sensitivity * delta_time;
-            Vector3f mouse_vector_view = new Vector3f().fma((float) mouse_x, this.editor.camera.right)
-                    .fma((float) mouse_y, this.editor.camera.up)
+            offset_x *= this.editor.camera.mouse_sensitivity * delta_time;
+            offset_y *= this.editor.camera.mouse_sensitivity * delta_time;
+            Vector3f mouse_vector_view = new Vector3f().fma((float) offset_x, this.editor.camera.right)
+                    .fma((float) offset_y, this.editor.camera.up)
                     .fma(0.f, this.editor.camera.front);
             Vector3f translation_vector = new Vector3f();
 

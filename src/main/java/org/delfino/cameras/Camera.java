@@ -144,12 +144,12 @@ public class Camera {
         }
     }
 
-    public void process_mouse_movement(double mouse_x, double mouse_y, double delta_time) {
-        mouse_x *= this.mouse_sensitivity * delta_time;
-        mouse_y *= this.mouse_sensitivity * delta_time;
+    public void process_mouse_movement(double offset_x, double offset_y, double delta_time) {
+        offset_x *= this.mouse_sensitivity * delta_time;
+        offset_y *= this.mouse_sensitivity * delta_time;
 
-        this.yaw   += (float) mouse_x;
-        this.pitch += (float) mouse_y;
+        this.yaw   += (float) offset_x;
+        this.pitch += (float) offset_y;
 
         if (this.pitch > 89.f) {
             this.pitch = 89.f;

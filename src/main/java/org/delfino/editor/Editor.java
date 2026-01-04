@@ -139,9 +139,9 @@ public class Editor {
         }
     }
 
-    public void process_mouse_movement(double mouse_x, double mouse_y, double delta_time) {
+    public void process_mouse_movement(double offset_x, double offset_y, double delta_time) {
         if (gizmo != null) {
-            this.gizmo.transform_object(selected_object, mouse_x, mouse_y, delta_time);
+            this.gizmo.transform_object(selected_object, offset_x, offset_y, delta_time);
         }
     }
 
