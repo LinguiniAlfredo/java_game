@@ -101,15 +101,16 @@ public class Game {
         if (Context.gamemode != PAUSED) {
             if (Context.gamemode != EDIT) {
                 Context.gamemode = EDIT;
-                if (Context.editor == null) {
-                    Context.editor = new Editor();
+                if (Context.editor != null) {
+                    Context.editor.delete();
                 }
+                Context.editor = new Editor();
             } else {
                 Context.gamemode = GAME;
                 if (Context.current_scene != null) {
                     Context.current_scene.delete();
                 }
-                Context.current_scene = new Scene("scenes/example_level.json");
+                Context.current_scene = new Scene("./example_level.json");
             }
         }
     }

@@ -28,7 +28,7 @@ public class Player extends Entity {
     private ArrayList<Vector3f> collision_vectors = new ArrayList<>();
     private ArrayList<Vector3f> collision_normals = new ArrayList<>();
     private Vector3f tmp = new Vector3f();
-    private float movement_speed = 10.0f;
+    public float movement_speed = 10.0f;
     public Vector3f trajectory = new Vector3f();
 
     public Player(Scene scene, Vector3f position) {
@@ -58,6 +58,8 @@ public class Player extends Entity {
     @Override
     public void update(double delta_time) {
         this.camera.update(delta_time);
+        float scale = this.movement_speed * (float) delta_time;
+        this.position.fma(scale, this.trajectory);
 
         this.velocity.zero();
         this.collision_vectors.clear();
@@ -76,10 +78,6 @@ public class Player extends Entity {
         } else {
             this.position.set(this.collision.position);
         }
-
-        float scale = this.movement_speed * (float) delta_time;
-        this.position.fma(scale, this.trajectory);
-
     }
 
     @Override

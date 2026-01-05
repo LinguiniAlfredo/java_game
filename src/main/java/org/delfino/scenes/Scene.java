@@ -69,7 +69,6 @@ public class Scene {
         }
 
         this.skybox.render();
-
     }
 
     public void delete() {
