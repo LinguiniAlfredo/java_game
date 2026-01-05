@@ -18,4 +18,8 @@ public class Cube extends Entity {
                 "textures/cube.png"
         );
     }
+
+    public Cube(Scene scene, Vector3f position, Quaternionf rotation, Vector3f scale) {
+        super(scene, CUBE, "models/cube.obj", position, rotation, scale, "textures/cube.png");
+    }
 }

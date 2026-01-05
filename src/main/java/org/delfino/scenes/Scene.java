@@ -1,18 +1,18 @@
 package org.delfino.scenes;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import org.delfino.Context;
 import org.delfino.Gamemode;
 import org.delfino.entities.*;
 import org.delfino.renderer.Shadowmap;
 import org.delfino.renderer.Skybox;
+import org.delfino.scenes.dtos.EntityDTO;
 import org.joml.Vector3f;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -23,16 +23,17 @@ public class Scene {
     public LightCube         light_cube;
     public ArrayList<Entity> entities = new ArrayList<>();
     public Shadowmap         shadow_map;
+    public String            filename;
 
     public Scene(String filename) {
+        this.filename   = filename;
         this.skybox     = new Skybox();
         this.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
         this.shadow_map = new Shadowmap();
-        this.player     = new Player(this, new Vector3f(0.f, 10.f, 20.f));
 
-        init_entities();
+//        init_entities();
         glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-//        load_scene_from_file(filename);
+        load_scene_from_file();
     }
 
     public void reset_colliders() {
@@ -92,7 +93,9 @@ public class Scene {
                 this.entities.add(new Sphere(this, new Vector3f()));
                 break;
             case PLAYER:
-                this.entities.add(new Player(this, new Vector3f()));
+                if (this.player == null) {
+                    this.entities.add(new Player(this, new Vector3f()));
+                }
                 break;
         }
     }
@@ -127,22 +130,60 @@ public class Scene {
         this.entities.add(new Cube(this, new Vector3f(-19.f, 2.f, 17.f)));
     }
 
-    private void load_scene_from_file(String filename) {
-        String path = String.valueOf(Scene.class.getResource("/" + filename));
-        try (Reader reader = new FileReader(path)) {
+    private void load_scene_from_file() {
+        Gson gson = new Gson();
+        try(FileReader reader = new FileReader(this.filename)) {
             JsonElement root = JsonParser.parseReader(reader);
             if (root.isJsonArray()) {
                 JsonArray json_array = root.getAsJsonArray();
-//                JsonObject obj = root.getAsJsonObject();
-//                String type = obj.get("type").getAsString();
-//                switch (type) {
-//                    case "cube":
-//                        this.entities.add(new Cube(position, rotation, scale));
-//                }
+                for (JsonElement object : json_array) {
+                    EntityDTO entity = gson.fromJson(object, EntityDTO.class);
+                    switch (entity.type) {
+                        case "cube":
+                            this.entities.add(new Cube(this, entity.position, entity.orientation, entity.scale));
+                            break;
+                        case "sphere":
+                            this.entities.add(new Sphere(this, entity.position, entity.orientation, entity.scale));
+                            break;
+                        case "player":
+                            if (this.player == null) {
+                                this.player = new Player(this, entity.position, entity.orientation, entity.scale);
+                                this.entities.add(this.player);
+                            }
+                            break;
+                    }
+                }
             }
 
         } catch(IOException e) {
             System.out.println("failed to read scene file...");
+        }
+    }
+
+    public void save_scene_to_file() {
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .disableHtmlEscaping()
+                .create();
+
+        JsonArray json_array = new JsonArray();
+        String saved_file = this.filename;
+        for (int i = 0; i < this.entities.size(); i++) {
+            EntityDTO dto = new EntityDTO(this.entities.get(i), i);
+            json_array.add(gson.toJsonTree(dto));
+        }
+
+        try {
+            Path path = Paths.get(saved_file);
+            if (!Files.exists(path)) {
+                Files.createFile(path);
+            }
+            Writer writer = Files.newBufferedWriter(path);
+            gson.toJson(json_array, writer);
+            writer.close();
+
+        } catch (IOException e) {
+            System.out.println("failed to save level file...");
         }
     }
 

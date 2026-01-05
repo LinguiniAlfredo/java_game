@@ -34,7 +34,9 @@ public class Model {
     public Model(String model_path, String texture_path) {
         this.model_path   = model_path;
         this.texture_path = texture_path;
-        load_model();
+        if (model_path != "") {
+            load_model();
+        }
     }
 
     public void delete() {

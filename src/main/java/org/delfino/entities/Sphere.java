@@ -19,4 +19,8 @@ public class Sphere extends Entity {
                 ""
         );
     }
+
+    public Sphere(Scene scene, Vector3f position, Quaternionf rotation, Vector3f scale) {
+        super(scene, SPHERE, "models/sphere.obj", position, rotation, scale, "");
+    }
 }

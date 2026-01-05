@@ -45,6 +45,14 @@ public class Player extends Entity {
         this.collision = new Collision(position, width, height, depth);
     }
 
+    public Player(Scene scene, Vector3f position, Quaternionf rotation, Vector3f scale) {
+        super(scene, PLAYER, "", position, rotation, scale, "");
+        this.camera = new FPSCamera(position, new Vector3f(0.f, 0.f, 1.f));
+        Context.camera = this.camera;
+
+        this.collision = new Collision(position, width, height, depth);
+    }
+
     @Override
     public void update(double delta_time) {
         this.camera.update(delta_time);

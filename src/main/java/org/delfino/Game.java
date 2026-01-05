@@ -38,7 +38,7 @@ public class Game {
         init_glfw();
 
         Context.ui            = new UI();
-        Context.current_scene = new Scene("scenes/example_level.json");
+        Context.current_scene = new Scene("./example_level.json");
 
         game_loop();
         close_app();
@@ -257,6 +257,7 @@ public class Game {
                                 }
                             }
                             case GLFW_KEY_F -> Context.editor.find_object();
+                            case GLFW_KEY_F12-> Context.current_scene.save_scene_to_file();
                         }
                     }
                 }

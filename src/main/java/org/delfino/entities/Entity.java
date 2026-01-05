@@ -104,4 +104,5 @@ public class Entity {
         int num_of_type = scene.entities.stream().filter(e -> e.type == type).toList().size();
         return name + "_" + num_of_type;
     }
+
 }
