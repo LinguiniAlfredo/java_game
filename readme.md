@@ -1,3 +1,7 @@
+## 3D Game Engine
+A 3D game engine with built-in editor. Ported and expanded upon my C++ 3D engine. 
+Still WIP...
+
 ### TODO
 * Fix camera orientation on editor start and play start
 * Fix rotate/scale gizmo functionality
