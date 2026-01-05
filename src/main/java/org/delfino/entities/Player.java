@@ -28,6 +28,8 @@ public class Player extends Entity {
     private ArrayList<Vector3f> collision_vectors = new ArrayList<>();
     private ArrayList<Vector3f> collision_normals = new ArrayList<>();
     private Vector3f tmp = new Vector3f();
+    private float movement_speed = 10.0f;
+    public Vector3f trajectory = new Vector3f();
 
     public Player(Scene scene, Vector3f position) {
         super(
@@ -39,7 +41,7 @@ public class Player extends Entity {
             new Vector3f(1.f, 1.f, 1.f),
             ""
         );
-        this.camera = new FPSCamera(position, new Vector3f(0.f, 0.f, 1.f));
+        this.camera = new FPSCamera(this, position, new Vector3f(0.f, 0.f, 1.f));
         Context.camera = this.camera;
 
         this.collision = new Collision(position, width, height, depth);
@@ -47,7 +49,7 @@ public class Player extends Entity {
 
     public Player(Scene scene, Vector3f position, Quaternionf rotation, Vector3f scale) {
         super(scene, PLAYER, "", position, rotation, scale, "");
-        this.camera = new FPSCamera(position, new Vector3f(0.f, 0.f, 1.f));
+        this.camera = new FPSCamera(this, position, new Vector3f(0.f, 0.f, 1.f));
         Context.camera = this.camera;
 
         this.collision = new Collision(position, width, height, depth);
@@ -60,7 +62,6 @@ public class Player extends Entity {
         this.velocity.zero();
         this.collision_vectors.clear();
         boolean colliding = false;
-        this.camera.update_camera_vectors();
 
         tmp.set(this.gravity);
         this.velocity.set(this.tmp.mul((float)delta_time));
@@ -75,6 +76,10 @@ public class Player extends Entity {
         } else {
             this.position.set(this.collision.position);
         }
+
+        float scale = this.movement_speed * (float) delta_time;
+        this.position.fma(scale, this.trajectory);
+
     }
 
     @Override

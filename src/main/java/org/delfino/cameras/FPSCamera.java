@@ -2,6 +2,7 @@ package org.delfino.cameras;
 
 import org.delfino.Context;
 import org.delfino.entities.Entity;
+import org.delfino.entities.Player;
 import org.delfino.utils.Collision;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -12,17 +13,29 @@ import static org.delfino.Context.window;
 
 public class FPSCamera extends Camera {
     public Collision collision;
+    public Player player;
+    public float height = 6.f;
 
-    public FPSCamera(Vector3f position) {
+    public FPSCamera(Player player, Vector3f position) {
         super(position);
+        this.player = player;
     }
 
-    public FPSCamera(Vector3f position, Vector3f front) {
+    public FPSCamera(Player player, Vector3f position, Vector3f front) {
         super(position, front);
+        this.player = player;
     }
 
     public FPSCamera(Camera other) {
         super(other);
+    }
+
+    @Override
+    public void update(double delta_time) {
+        update_camera_vectors();
+        if (this.player != null) {
+            this.position = new Vector3f(this.player.position.x, this.height, this.player.position.z);
+        }
     }
 
     @Override
@@ -70,10 +83,12 @@ public class FPSCamera extends Camera {
         this.front.cross(this.world_up, this.right).normalize();
         this.right.cross(this.front, this.up).normalize();
 
-        this.trajectory.zero();
-        this.trajectory.fma(input_vector.x, right)
-                .fma(input_vector.y, up)
-                .fma(input_vector.z, front);
+        if (this.player != null) {
+            this.player.trajectory.zero();
+            this.player.trajectory.fma(input_vector.x, right)
+                    .fma(input_vector.y, up)
+                    .fma(input_vector.z, front);
+        }
 
         if (yaw_rad != 0 || pitch_rad != 0) {
             this.front.set(
