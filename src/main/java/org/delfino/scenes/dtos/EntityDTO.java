@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.delfino.entities.Entity;
-import org.delfino.entities.EntityType;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -15,9 +14,6 @@ public class EntityDTO {
     public Quaternionf orientation;
     public Vector3f    scale;
 
-    public EntityDTO() {
-
-    }
 
     public EntityDTO(JsonObject json_object) {
         Gson gson = new Gson();

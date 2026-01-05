@@ -31,7 +31,6 @@ public class Scene {
         this.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
         this.shadow_map = new Shadowmap();
 
-//        init_entities();
         glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         load_scene_from_file();
     }
@@ -98,36 +97,6 @@ public class Scene {
                 }
                 break;
         }
-    }
-
-    private void init_entities() {
-        this.entities.add(this.player);
-        for (int i = 1; i < 20; i+=2) {
-            for (int j = 1; j < 20; j+=2) {
-                float x = (float)i;
-                float z = (float)j;
-                this.entities.add(new Cube(this, new Vector3f(x, 0.f, z)));
-                this.entities.add(new Cube(this, new Vector3f(-x, 0.f, -z)));
-                this.entities.add(new Cube(this, new Vector3f(x, 0.f, -z)));
-                this.entities.add(new Cube(this, new Vector3f(-x, 0.f, z)));
-
-                if (x == 9) {
-                    this.entities.add(new Cube(this, new Vector3f(x, 2.f, z)));
-                    this.entities.add(new Cube(this, new Vector3f(-x, 2.f, -z)));
-                    this.entities.add(new Cube(this, new Vector3f(-x, 4.f, -z)));
-                    this.entities.add(new Cube(this, new Vector3f(-x, 6.f, -z)));
-                }
-                if (z == 9) {
-                    this.entities.add(new Cube(this, new Vector3f(x, 2.f, z)));
-                    this.entities.add(new Cube(this, new Vector3f(-x, 2.f, -z)));
-                }
-            }
-        }
-        this.entities.add(new Cube(this, new Vector3f(0.f, 4.f, 0.f)));
-        this.entities.add(new Cube(this, new Vector3f(-5.f, 2.f, 5.f)));
-
-        this.entities.add(new Cube(this, new Vector3f(-17.f, 2.f, 19.f)));
-        this.entities.add(new Cube(this, new Vector3f(-19.f, 2.f, 17.f)));
     }
 
     private void load_scene_from_file() {
