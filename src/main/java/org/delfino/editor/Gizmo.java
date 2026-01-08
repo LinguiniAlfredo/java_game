@@ -47,9 +47,10 @@ public class Gizmo {
         glDeleteVertexArrays(this.VAO);
         glDeleteBuffers(this.VBO);
         this.shader.delete();
-        this.x_axis_volume.delete();
-        this.y_axis_volume.delete();
-        this.z_axis_volume.delete();
+
+        if (this.x_axis_volume != null) this.x_axis_volume.delete();
+        if (this.y_axis_volume != null) this.y_axis_volume.delete();
+        if (this.z_axis_volume != null) this.z_axis_volume.delete();
     }
 
     public void render() {

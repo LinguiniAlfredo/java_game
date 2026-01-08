@@ -5,6 +5,7 @@ import org.delfino.Context;
 import org.delfino.editor.menus.ObjectListMenu;
 import org.delfino.editor.menus.PropertiesMenu;
 import org.delfino.entities.Entity;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -32,6 +33,9 @@ public class Editor {
         this.gridlines.delete();
         if (this.gizmo != null) {
             this.gizmo.delete();
+        }
+        if (this.compass != null) {
+            this.compass.delete();
         }
     }
 
@@ -150,6 +154,24 @@ public class Editor {
             Vector3f object_position = new Vector3f(this.selected_object.position);
             this.camera.position = object_position.sub(new Vector3f(10.f, 10.f, -10.f));
             this.camera.look_at(object_position);
+        }
+    }
+
+    public void delete_object() {
+        if (this.selected_object != null) {
+            Context.current_scene.entities.remove(this.selected_object);
+            deselect_object();
+        }
+    }
+
+    public void duplicate_object() {
+        if (this.selected_object != null) {
+            Context.current_scene.add_entity(
+                    this.selected_object.type,
+                    new Vector3f(this.selected_object.position),
+                    new Quaternionf(this.selected_object.orientation),
+                    new Vector3f(this.selected_object.scale)
+            );
         }
     }
 }

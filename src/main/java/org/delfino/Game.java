@@ -259,6 +259,12 @@ public class Game {
                             }
                             case GLFW_KEY_F -> Context.editor.find_object();
                             case GLFW_KEY_F12-> Context.current_scene.save_scene_to_file();
+                            case GLFW_KEY_D -> {
+                                if ((mods & GLFW_MOD_CONTROL) != 0) {
+                                    Context.editor.duplicate_object();
+                                }
+                            }
+                            case GLFW_KEY_DELETE -> Context.editor.delete_object();
                         }
                     }
                 }

@@ -7,6 +7,7 @@ import org.delfino.entities.*;
 import org.delfino.renderer.Shadowmap;
 import org.delfino.renderer.Skybox;
 import org.delfino.scenes.dtos.EntityDTO;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.io.*;
@@ -82,20 +83,24 @@ public class Scene {
         this.entities.clear();
     }
 
-    public void add_entity(EntityType type) {
+    public void add_entity(EntityType type, Vector3f position, Quaternionf orientation, Vector3f scale) {
         switch (type) {
             case CUBE:
-                this.entities.add(new Cube(this, new Vector3f()));
+                this.entities.add(new Cube(this, position, orientation, scale));
                 break;
             case SPHERE:
-                this.entities.add(new Sphere(this, new Vector3f()));
+                this.entities.add(new Sphere(this, position, orientation, scale));
                 break;
             case PLAYER:
                 if (this.player == null) {
-                    this.entities.add(new Player(this, new Vector3f()));
+                    this.entities.add(new Player(this, position, orientation, scale));
                 }
                 break;
         }
+    }
+
+    public void add_entity(EntityType type) {
+        this.add_entity(type, new Vector3f(), new Quaternionf(), new Vector3f(1.f));
     }
 
     private void load_scene_from_file() {
