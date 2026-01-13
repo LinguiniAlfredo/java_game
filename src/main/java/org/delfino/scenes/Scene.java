@@ -2,7 +2,7 @@ package org.delfino.scenes;
 
 import com.google.gson.*;
 import org.delfino.Context;
-import org.delfino.Gamemode;
+import org.delfino.cameras.StaticCamera;
 import org.delfino.entities.*;
 import org.delfino.renderer.Shadowmap;
 import org.delfino.renderer.Skybox;
@@ -19,18 +19,26 @@ import java.util.ArrayList;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Scene {
-    public Player            player;
-    public Skybox            skybox;
-    public LightCube         light_cube;
-    public ArrayList<Entity> entities = new ArrayList<>();
-    public Shadowmap         shadow_map;
-    public String            filename;
+    public TankController          player;
+    public Skybox                  skybox;
+    public LightCube               light_cube;
+    public Shadowmap               shadow_map;
+    public String                  filename;
+    public ArrayList<Entity>       entities = new ArrayList<>();
 
     public Scene(String filename) {
         this.filename   = filename;
         this.skybox     = new Skybox();
         this.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
         this.shadow_map = new Shadowmap();
+
+        Vector3f p = new Vector3f(0.f, 20.f, -20.f);
+        Vector3f f = new Vector3f(0.f, 0.f, 0.f).sub(p).normalize();
+        StaticCamera staticCamera = new StaticCamera(this, p, f);
+        this.entities.add(staticCamera);
+        Context.active_camera = staticCamera;
+        this.player = new TankController(this, new Vector3f(0.f, 1.f, 10.f));
+        this.entities.add(this.player);
 
         glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         load_scene_from_file();
@@ -55,9 +63,6 @@ public class Scene {
         this.shadow_map.do_pass();
         this.light_cube.render();
 
-        if (Context.gamemode == Gamemode.EDIT) {
-            this.player.render_collider();
-        }
         for (Entity entity : this.entities) {
             entity.render();
             if (Context.show_collisions) {
@@ -91,10 +96,18 @@ public class Scene {
             case SPHERE:
                 this.entities.add(new Sphere(this, position, orientation, scale));
                 break;
-            case PLAYER:
+            case FIRST_PERSON_CONTROLLER:
                 if (this.player == null) {
-                    this.entities.add(new Player(this, position, orientation, scale));
+                    this.entities.add(new FirstPersonController(this, position, orientation, scale));
                 }
+                break;
+            case TANK_CONTROLLER:
+                if (this.player == null) {
+                    this.entities.add(new TankController(this, position, orientation, scale));
+                }
+                break;
+            case CAMERA:
+                this.entities.add(new StaticCamera(this, position, new Vector3f(0.f, 0.f, 1.f)));
                 break;
         }
     }
@@ -120,9 +133,12 @@ public class Scene {
                             break;
                         case "player":
                             if (this.player == null) {
-                                this.player = new Player(this, entity.position, entity.orientation, entity.scale);
+                                this.player = new TankController(this, entity.position, entity.orientation, entity.scale);
                                 this.entities.add(this.player);
                             }
+                            break;
+                        case "camera":
+                            this.entities.add(new StaticCamera(this, entity.position, entity.front));
                             break;
                     }
                 }

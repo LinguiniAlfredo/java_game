@@ -66,7 +66,7 @@ public class Collision {
         Vector2f result = new Vector2f();
 
         return Intersectionf.intersectRayAab(
-                Context.camera.position,
+                Context.active_camera.position,
                 ray,
                 min,
                 max,
@@ -82,7 +82,7 @@ public class Collision {
         Vector3f hit_point = new Vector3f();
 
         boolean hit = Intersectionf.intersectRayAab(
-                Context.camera.position,
+                Context.active_camera.position,
                 ray,
                 min,
                 max,
@@ -93,7 +93,7 @@ public class Collision {
             float t_hit = result.x >= 0.f ? result.x : result.y;
             hit_point = new Vector3f(ray)
                     .mul(t_hit)
-                    .add(Context.camera.position);
+                    .add(Context.active_camera.position);
         }
 
         return hit_point;
@@ -139,8 +139,8 @@ public class Collision {
     public void render() {
         this.model.identity().translate(this.position);
 
-        Matrix4f view = Context.camera.get_view_matrix();
-        Matrix4f proj = Context.camera.get_perspective_matrix();
+        Matrix4f view = Context.active_camera.get_view_matrix();
+        Matrix4f proj = Context.active_camera.get_perspective_matrix();
         Vector3f color = this.is_colliding ? this.red : this.green;
 
         this.shader.use();

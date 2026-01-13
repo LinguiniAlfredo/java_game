@@ -1,14 +1,14 @@
 package org.delfino.cameras;
 
-import org.delfino.entities.Player;
+import org.delfino.scenes.Scene;
 import org.joml.Vector3f;
 
 public class FollowCamera extends Camera {
 
     public float follow_distance = 10.f;
 
-    public FollowCamera(Vector3f position, Vector3f front) {
-        super(position, front);
+    public FollowCamera(Scene scene, Vector3f position, Vector3f front) {
+        super(scene, position, front);
     }
 
     @Override

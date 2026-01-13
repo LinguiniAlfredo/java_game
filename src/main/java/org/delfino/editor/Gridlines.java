@@ -33,8 +33,8 @@ public class Gridlines {
     }
 
     public void render() {
-        Matrix4f mat_view = Context.camera.get_view_matrix();
-        Matrix4f mat_proj = Context.camera.get_perspective_matrix();
+        Matrix4f mat_view = Context.active_camera.get_view_matrix();
+        Matrix4f mat_proj = Context.active_camera.get_perspective_matrix();
 
         this.shader.use();
         this.shader.set_float("grid_scale", 1.f);

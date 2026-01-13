@@ -22,7 +22,7 @@ public class Compass extends Gizmo {
         Matrix4f mat_model = new Matrix4f();
         Matrix4f mat_view  = new Matrix4f()
                 .identity()
-                .lookAt(Context.camera.front, new Vector3f(0.f, 0.f, 0.f), Context.camera.up);
+                .lookAt(Context.active_camera.front, new Vector3f(0.f, 0.f, 0.f), Context.active_camera.up);
         Matrix4f mat_proj  = new Matrix4f().ortho(-1.f, 1.f, -1.f, 1.f, 1.f, 1000.f);
 
         this.shader.use();

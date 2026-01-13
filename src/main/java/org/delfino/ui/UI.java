@@ -38,7 +38,7 @@ public class UI {
         if (Context.gamemode == Gamemode.PAUSED) {
             render_pause_menu();
         } else if (Context.gamemode == Gamemode.GAME){
-            if (Context.camera instanceof FPSCamera) {
+            if (Context.active_camera instanceof FPSCamera) {
                 render_crosshair();
             }
         }

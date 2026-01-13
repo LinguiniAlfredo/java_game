@@ -1,6 +1,7 @@
 package org.delfino.cameras;
 
-import org.delfino.entities.Player;
+import org.delfino.entities.FirstPersonController;
+import org.delfino.scenes.Scene;
 import org.delfino.utils.Collision;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -9,17 +10,17 @@ import static org.delfino.Context.window;
 
 public class FPSCamera extends Camera {
     public Collision collision;
-    public Player player;
+    public FirstPersonController firstPersonController;
     public float head_height = 4.f;
 
-    public FPSCamera(Player player, Vector3f position) {
-        super(position);
-        this.player = player;
+    public FPSCamera(Scene scene, FirstPersonController firstPersonController, Vector3f position) {
+        super(scene, position);
+        this.firstPersonController = firstPersonController;
     }
 
-    public FPSCamera(Player player, Vector3f position, Vector3f front) {
-        super(position, front);
-        this.player = player;
+    public FPSCamera(Scene scene, FirstPersonController firstPersonController, Vector3f position, Vector3f front) {
+        super(scene, position, front);
+        this.firstPersonController = firstPersonController;
     }
 
     public FPSCamera(Camera other) {
@@ -29,15 +30,15 @@ public class FPSCamera extends Camera {
     @Override
     public void update(double delta_time) {
         update_camera_vectors();
-        if (this.player != null) {
-            this.position = new Vector3f(this.player.position.x, this.player.position.y + this.head_height, this.player.position.z);
+        if (this.firstPersonController != null) {
+            this.position = new Vector3f(this.firstPersonController.position.x, this.firstPersonController.position.y + this.head_height, this.firstPersonController.position.z);
         }
     }
 
     @Override
     public void process_keyboard() {
         this.input_vector.zero();
-        this.player.movement_speed = SPEED;
+        this.firstPersonController.movement_speed = SPEED;
 
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS) {
             this.input_vector.z = 1;
@@ -52,7 +53,7 @@ public class FPSCamera extends Camera {
             this.input_vector.x = 1;
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS) {
-            this.player.movement_speed = SPEED * 2;
+            this.firstPersonController.movement_speed = SPEED * 2;
         }
 
         if (this.input_vector.x != 0 || this.input_vector.y != 0 || this.input_vector.z != 0) {
@@ -79,9 +80,9 @@ public class FPSCamera extends Camera {
         this.front.cross(this.world_up, this.right).normalize();
         this.right.cross(this.front, this.up).normalize();
 
-        if (this.player != null) {
-            this.player.trajectory.zero();
-            this.player.trajectory.fma(input_vector.x, right)
+        if (this.firstPersonController != null) {
+            this.firstPersonController.trajectory.zero();
+            this.firstPersonController.trajectory.fma(input_vector.x, right)
                     .fma(input_vector.y, up)
                     .fma(input_vector.z, front);
         }

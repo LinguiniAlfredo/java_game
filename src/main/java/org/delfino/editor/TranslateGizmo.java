@@ -48,8 +48,8 @@ public class TranslateGizmo extends Gizmo {
     @Override
     public void render() {
         Matrix4f mat_model = new Matrix4f().translate(this.position);
-        Matrix4f mat_view  = Context.camera.get_view_matrix();
-        Matrix4f mat_proj  = Context.camera.get_perspective_matrix();
+        Matrix4f mat_view  = Context.active_camera.get_view_matrix();
+        Matrix4f mat_proj  = Context.active_camera.get_perspective_matrix();
 
         this.shader.use();
         this.shader.set_mat4("model", mat_model);

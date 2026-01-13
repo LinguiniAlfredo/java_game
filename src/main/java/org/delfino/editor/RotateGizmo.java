@@ -5,7 +5,6 @@ import org.delfino.entities.Entity;
 import org.delfino.utils.Collision;
 import org.delfino.utils.Utils;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -42,8 +41,8 @@ public class RotateGizmo extends Gizmo {
     @Override
     public void render() {
         Matrix4f mat_model = new Matrix4f().translate(this.position);
-        Matrix4f mat_view  = Context.camera.get_view_matrix();
-        Matrix4f mat_proj  = Context.camera.get_perspective_matrix();
+        Matrix4f mat_view  = Context.active_camera.get_view_matrix();
+        Matrix4f mat_proj  = Context.active_camera.get_perspective_matrix();
 
         this.shader.use();
         this.shader.set_mat4("model", mat_model);

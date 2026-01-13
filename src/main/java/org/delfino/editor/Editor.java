@@ -22,11 +22,12 @@ public class Editor {
     public Editor() {
         Vector3f p            = new Vector3f(40.f, 20.f, 0.f);
         Vector3f f            = new Vector3f(0.f, 0.f, 0.f).sub(p).normalize();
-        this.camera           = new EditorCamera(this, p, f);
-        Context.camera        = this.camera;
+        this.camera           = new EditorCamera(Context.current_scene, this, p, f);
         this.gridlines        = new Gridlines();
         this.object_list_menu = new ObjectListMenu(this, Context.current_scene.entities);
         this.compass          = new Compass(this);
+
+        Context.active_camera = this.camera;
     }
 
     public void delete() {
@@ -122,13 +123,13 @@ public class Editor {
 
         float min_dist = Float.MAX_VALUE;
         for (Entity object : intersecting_objects) {
-            float dist = object.position.distance(Context.camera.position);
+            float dist = object.position.distance(Context.active_camera.position);
             if (dist < min_dist) {
                 min_dist = dist;
             }
         }
         for (Entity object : intersecting_objects) {
-            float dist = object.position.distance(Context.camera.position);
+            float dist = object.position.distance(Context.active_camera.position);
             if (dist == min_dist) {
                 set_selected_object(object);
             }

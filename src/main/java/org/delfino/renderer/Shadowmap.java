@@ -2,6 +2,7 @@ package org.delfino.renderer;
 
 import org.delfino.Context;
 import org.delfino.entities.Entity;
+import org.delfino.entities.EntityType;
 import org.delfino.utils.Shader;
 import org.delfino.utils.Utils;
 import org.joml.Matrix4f;

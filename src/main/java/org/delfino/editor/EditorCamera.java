@@ -2,6 +2,7 @@ package org.delfino.editor;
 
 import org.delfino.Context;
 import org.delfino.cameras.Camera;
+import org.delfino.scenes.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.system.MemoryStack;
@@ -17,13 +18,13 @@ public class EditorCamera extends Camera {
     private Editor    editor;
     public  Vector3f  ray;
 
-    public EditorCamera(Editor editor, Vector3f position) {
-        super(position);
+    public EditorCamera(Scene scene, Editor editor, Vector3f position) {
+        super(scene, position);
         this.editor = editor;
         set_mode(CameraMode.SELECT);
     }
-    public EditorCamera(Editor editor, Vector3f position, Vector3f front) {
-        super(position, front);
+    public EditorCamera(Scene scene, Editor editor, Vector3f position, Vector3f front) {
+        super(scene, position, front);
         this.editor = editor;
         set_mode(CameraMode.SELECT);
     }
@@ -74,10 +75,10 @@ public class EditorCamera extends Camera {
 
     private Vector3f get_ray_from_mouse(float ndc_mouse_x, float ndc_mouse_y) {
         Vector4f ray_clip = new Vector4f(ndc_mouse_x, ndc_mouse_y, -1, 0);
-        Vector4f ray_eye  = ray_clip.mul(Context.camera.get_perspective_matrix().invert());
+        Vector4f ray_eye  = ray_clip.mul(Context.active_camera.get_perspective_matrix().invert());
         ray_eye.z = -1.f;
         ray_eye.w =  0.f;
-        Vector4f tmp = ray_eye.mul(Context.camera.get_view_matrix().invert());
+        Vector4f tmp = ray_eye.mul(Context.active_camera.get_view_matrix().invert());
         return new Vector3f(tmp.x, tmp.y, tmp.z).normalize();
     }
 

@@ -27,6 +27,20 @@ public class Entity {
     public Scene       scene;
     public EntityType  type;
 
+    public Entity() {
+
+    }
+
+    // This function is for the camera class's constructor
+    // It simply creates a dummy entity of type CAMERA for integration into editor
+    // All functionality happens in the parent camera class
+    public Entity(Scene scene, EntityType type, Vector3f position) {
+        this.scene = scene;
+        this.type  = type;
+        this.name  = get_entity_name();
+        this.position = position;
+    }
+
     public Entity(Scene scene, EntityType type, String filename, Vector3f position, Quaternionf orientation, Vector3f scale, String texture) {
         this.scene              = scene;
         this.type               = type;
@@ -44,9 +58,9 @@ public class Entity {
     }
 
     public void delete() {
-        this.shader.delete();
-        this.model.delete();
-        this.collision.delete();
+        if (this.shader != null) this.shader.delete();
+        if (this.model != null) this.model.delete();
+        if (this.collision != null) this.collision.delete();
     }
 
     public void update(double delta_time) {
@@ -54,15 +68,21 @@ public class Entity {
     }
 
     public void render() {
-        this.model.render(this.shader, this.position, this.orientation, this.scale, this.selected);
+        if (this.model != null) {
+            this.model.render(this.shader, this.position, this.orientation, this.scale, this.selected);
+        }
     }
 
     public void render_collider() {
-        this.collision.render();
+        if (this.collision != null) {
+            this.collision.render();
+        }
     }
 
     public void render_shadow_map(Shader shadow_map_shader) {
-        this.model.render_shadow_map(shadow_map_shader, this.position, this.orientation, this.scale);
+        if (this.model != null) {
+            this.model.render_shadow_map(shadow_map_shader, this.position, this.orientation, this.scale);
+        }
     }
 
     private Vector3f get_dimensions() {

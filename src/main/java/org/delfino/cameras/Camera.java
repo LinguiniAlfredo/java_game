@@ -2,13 +2,16 @@ package org.delfino.cameras;
 
 import org.delfino.Context;
 
+import org.delfino.entities.Entity;
+import org.delfino.entities.EntityType;
+import org.delfino.scenes.Scene;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import static org.delfino.Context.window;
 
-public class Camera {
+public class Camera extends Entity {
 
     final float YAW         =   0.0f;
     final float PITCH       =   0.0f;
@@ -23,7 +26,7 @@ public class Camera {
         float far    = 1000.f;
     }
 
-    public Vector3f position;
+    public Scene    scene;
     public Vector3f front;
     public Vector3f up;
     public Vector3f right;
@@ -42,7 +45,8 @@ public class Camera {
 
     public Frustrum frustrum;
 
-    public Camera(Vector3f position) {
+    public Camera(Scene scene, Vector3f position) {
+        this.scene             = scene;
         this.position          = position;
         this.front             = new Vector3f(0.f, 0.f, -1.f);
         this.right             = new Vector3f();
@@ -60,8 +64,9 @@ public class Camera {
         update_camera_vectors();
     }
 
-    public Camera(Vector3f position, Vector3f front) {
-        this.position          = position;
+    public Camera(Scene scene, Vector3f position, Vector3f front) {
+        super(scene, EntityType.CAMERA, position);
+        this.scene             = scene;
         this.front             = front;
         this.right             = new Vector3f();
         this.up                = new Vector3f();
@@ -79,6 +84,7 @@ public class Camera {
     }
 
     public Camera(Camera other) {
+        this.scene             = other.scene;
         this.position          = other.position;
         this.front             = other.front;
         this.up                = other.up;

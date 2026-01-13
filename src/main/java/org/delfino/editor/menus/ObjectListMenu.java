@@ -3,12 +3,12 @@ package org.delfino.editor.menus;
 import imgui.ImGui;
 import imgui.type.ImInt;
 import org.delfino.Context;
+import org.delfino.cameras.StaticCamera;
 import org.delfino.editor.Editor;
 import org.delfino.entities.Entity;
 import org.delfino.entities.EntityType;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class ObjectListMenu extends Menu {
     public ArrayList<Entity> entities;
@@ -20,14 +20,14 @@ public class ObjectListMenu extends Menu {
     public ObjectListMenu(Editor editor, ArrayList<Entity> entities) {
         this.editor          = editor;
         this.entities        = entities;
-        this.add_entity_type = EntityType.values()[add_entity_index.intValue()];
+        this.add_entity_type = EntityType.values()[this.add_entity_index.intValue()];
     }
 
     public void render() {
-        ImGui.begin("Entities");
+        ImGui.begin("Objects In Scene");
 
-        if (ImGui.combo("##", add_entity_index, EntityType.to_string_array())) {
-            this.add_entity_type = EntityType.values()[add_entity_index.intValue()];
+        if (ImGui.combo("##", this.add_entity_index, EntityType.to_string_array())) {
+            this.add_entity_type = EntityType.values()[this.add_entity_index.intValue()];
         }
 
         if (ImGui.button("Add Entity")) {
@@ -35,9 +35,10 @@ public class ObjectListMenu extends Menu {
         }
 
         ImGui.newLine();
-        for (Entity entity : entities) {
-            if (ImGui.selectable(entity.name, selected)) {
-                editor.set_selected_object(entity);
+        ImGui.text("Objects in Scene");
+        for (Entity entity : this.entities) {
+            if (ImGui.selectable(entity.name, this.selected)) {
+                this.editor.set_selected_object(entity);
             }
         }
 

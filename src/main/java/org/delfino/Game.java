@@ -37,7 +37,7 @@ public class Game {
         init_context();
         init_glfw();
 
-        Context.ui            = new UI();
+        Context.ui = new UI();
         Context.current_scene = new Scene("./example_level.json");
 
         game_loop();
@@ -131,11 +131,13 @@ public class Game {
             prev_mouse_y = mouse_y[0];
 
             if (Context.gamemode != PAUSED) {
-                Context.camera.process_mouse_movement(x_offset, y_offset, delta_time);
+                Context.current_scene.player.process_mouse_movement(x_offset, y_offset, delta_time);
+                Context.active_camera.process_mouse_movement(x_offset, y_offset, delta_time);
             }
         }
         if (!ImGui.getIO().getWantCaptureKeyboard()) {
-            Context.camera.process_keyboard();
+            Context.current_scene.player.process_keyboard();
+            Context.active_camera.process_keyboard();
         }
     }
 

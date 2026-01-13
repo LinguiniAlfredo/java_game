@@ -4,7 +4,9 @@ package org.delfino.entities;
 public enum EntityType {
     CUBE,
     SPHERE,
-    PLAYER;
+    FIRST_PERSON_CONTROLLER,
+    TANK_CONTROLLER,
+    CAMERA;
 
     public static String[] to_string_array() {
         EntityType[] values = EntityType.values();

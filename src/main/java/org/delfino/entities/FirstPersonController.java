@@ -9,14 +9,14 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 
-import static org.delfino.entities.EntityType.PLAYER;
+import static org.delfino.entities.EntityType.FIRST_PERSON_CONTROLLER;
 
 enum PlayerState {
     GROUNDED,
     AIRBORNE,
 }
 
-public class Player extends Entity {
+public class FirstPersonController extends Entity {
 
     public FPSCamera camera;
     private PlayerState state;
@@ -31,26 +31,26 @@ public class Player extends Entity {
     public float movement_speed = 10.0f;
     public Vector3f trajectory = new Vector3f();
 
-    public Player(Scene scene, Vector3f position) {
+    public FirstPersonController(Scene scene, Vector3f position) {
         super(
             scene,
-            PLAYER,
+            FIRST_PERSON_CONTROLLER,
             "",
             position,
             new Quaternionf(0.f, 1.f, 0.f, 0.f),
             new Vector3f(1.f, 1.f, 1.f),
             ""
         );
-        this.camera = new FPSCamera(this, position, new Vector3f(0.f, 0.f, 1.f));
-        Context.camera = this.camera;
+        this.camera = new FPSCamera(Context.current_scene, this, position, new Vector3f(0.f, 0.f, 1.f));
+        Context.active_camera = this.camera;
 
         this.collision = new Collision(position, width, height, depth);
     }
 
-    public Player(Scene scene, Vector3f position, Quaternionf rotation, Vector3f scale) {
-        super(scene, PLAYER, "", position, rotation, scale, "");
-        this.camera = new FPSCamera(this, position, new Vector3f(0.f, 0.f, 1.f));
-        Context.camera = this.camera;
+    public FirstPersonController(Scene scene, Vector3f position, Quaternionf rotation, Vector3f scale) {
+        super(scene, FIRST_PERSON_CONTROLLER, "", position, rotation, scale, "");
+        this.camera = new FPSCamera(Context.current_scene, this, position, new Vector3f(0.f, 0.f, 1.f));
+        Context.active_camera = this.camera;
 
         this.collision = new Collision(position, width, height, depth);
     }
