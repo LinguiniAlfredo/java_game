@@ -1,6 +1,7 @@
 package org.delfino.entities;
 
 import org.delfino.Context;
+import org.delfino.cameras.Camera;
 import org.delfino.utils.Shader;
 import org.delfino.utils.Texture;
 import org.delfino.utils.Utils;
@@ -33,18 +34,18 @@ public class Mesh {
         init();
     }
 
-    public void render(Shader shader, Vector3f position, Quaternionf orientation, Vector3f scale, boolean selected) {
+    public void render(Camera camera, Shader shader, Vector3f position, Quaternionf orientation, Vector3f scale, boolean selected) {
         shader.use();
         shader.set_int("shadow_map", 0);
         shader.set_int("texture1", 1);
-        shader.set_vec3("camera_pos", Context.active_camera.position);
+        shader.set_vec3("camera_pos", camera.position);
         shader.set_vec3("light_pos", Context.current_scene.light_cube.position);
         shader.set_mat4("light_space_matrix", Context.current_scene.shadow_map.light_space_matrix);
         shader.set_int("selected", selected ? 1 : 0);
 
         mat_model.identity().scale(scale).translate(position).rotate(orientation);
-        Matrix4f mat_view = Context.active_camera.get_view_matrix();
-        Matrix4f mat_proj = Context.active_camera.get_perspective_matrix();
+        Matrix4f mat_view = camera.get_view_matrix();
+        Matrix4f mat_proj = camera.get_perspective_matrix();
 
         shader.set_mat4("model", mat_model);
         shader.set_mat4("view", mat_view);

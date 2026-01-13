@@ -110,7 +110,6 @@ public class Shadowmap {
         int quad_vao;
         int quad_vbo;
 
-
         quad_vao = glGenVertexArrays();
         quad_vbo = glGenBuffers();
         glBindVertexArray(quad_vao);
@@ -129,7 +128,9 @@ public class Shadowmap {
 
     public void render_shadow_map() {
         for (Entity entity : Context.current_scene.entities) {
-            entity.render_shadow_map(this.shader);
+            if (entity.type != EntityType.CAMERA) {
+                entity.render_shadow_map(this.shader);
+            }
         }
     }
 }

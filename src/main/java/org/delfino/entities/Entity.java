@@ -2,6 +2,9 @@ package org.delfino.entities;
 
 import org.apache.commons.io.FilenameUtils;
 import org.delfino.Context;
+import org.delfino.Gamemode;
+import org.delfino.cameras.Camera;
+import org.delfino.cameras.StaticCamera;
 import org.delfino.scenes.Scene;
 import org.delfino.utils.Collision;
 import org.delfino.utils.Shader;
@@ -69,7 +72,12 @@ public class Entity {
 
     public void render() {
         if (this.model != null) {
-            this.model.render(this.shader, this.position, this.orientation, this.scale, this.selected);
+            this.model.render(Context.active_camera, this.shader, this.position, this.orientation, this.scale, this.selected);
+        }
+    }
+    public void render(Camera cam) {
+        if (this.model != null) {
+            this.model.render(cam, this.shader, this.position, this.orientation, this.scale, this.selected);
         }
     }
 
@@ -84,6 +92,7 @@ public class Entity {
             this.model.render_shadow_map(shadow_map_shader, this.position, this.orientation, this.scale);
         }
     }
+
 
     private Vector3f get_dimensions() {
         float min_x = 0.f, max_x = 0.f;

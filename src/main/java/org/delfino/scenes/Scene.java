@@ -34,9 +34,6 @@ public class Scene {
 
         Vector3f p = new Vector3f(0.f, 20.f, -20.f);
         Vector3f f = new Vector3f(0.f, 0.f, 0.f).sub(p).normalize();
-        StaticCamera staticCamera = new StaticCamera(this, p, f);
-        this.entities.add(staticCamera);
-        Context.active_camera = staticCamera;
         this.player = new TankController(this, new Vector3f(0.f, 1.f, 10.f));
         this.entities.add(this.player);
 
@@ -138,7 +135,9 @@ public class Scene {
                             }
                             break;
                         case "camera":
-                            this.entities.add(new StaticCamera(this, entity.position, entity.front));
+                            StaticCamera cam = new StaticCamera(this, entity.position, entity.front);
+                            this.entities.add(cam);
+                            Context.active_camera = cam;
                             break;
                     }
                 }

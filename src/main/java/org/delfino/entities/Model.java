@@ -1,6 +1,9 @@
 package org.delfino.entities;
 
 import org.apache.commons.io.FilenameUtils;
+import org.delfino.Context;
+import org.delfino.cameras.Camera;
+import org.delfino.cameras.StaticCamera;
 import org.delfino.utils.Shader;
 import org.delfino.utils.Texture;
 import org.delfino.utils.Vertex;
@@ -50,9 +53,9 @@ public class Model {
         }
     }
 
-    public void render(Shader shader, Vector3f position, Quaternionf orientation, Vector3f scale, boolean selected) {
+    public void render(Camera cam, Shader shader, Vector3f position, Quaternionf orientation, Vector3f scale, boolean selected) {
         for (Mesh mesh : this.meshes) {
-            mesh.render(shader, position, orientation, scale, selected);
+            mesh.render(cam, shader, position, orientation, scale, selected);
         }
     }
 

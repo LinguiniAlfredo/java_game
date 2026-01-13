@@ -2,9 +2,12 @@ package org.delfino.editor;
 
 import imgui.ImGui;
 import org.delfino.Context;
+import org.delfino.cameras.Camera;
+import org.delfino.cameras.StaticCamera;
 import org.delfino.editor.menus.ObjectListMenu;
 import org.delfino.editor.menus.PropertiesMenu;
 import org.delfino.entities.Entity;
+import org.delfino.entities.EntityType;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -55,6 +58,10 @@ public class Editor {
         this.object_list_menu.render();
         if (this.selected_object != null) {
             this.properties_menu.render();
+            if (this.selected_object.type == EntityType.CAMERA) {
+                StaticCamera cam = (StaticCamera) this.selected_object;
+                cam.render_viewport();
+            }
         }
         this.compass.render();
 
