@@ -71,7 +71,7 @@ public class Scene {
             this.shadow_map.render_depth_quad();
         }
 
-        this.skybox.render();
+        this.skybox.render(Context.active_camera);
     }
 
     public void delete() {

@@ -66,7 +66,7 @@ public class Camera extends Entity {
     }
 
     public Camera(Scene scene, Vector3f position, Vector3f front) {
-        super(scene, EntityType.CAMERA, "models/arrow.fbx", position, new Quaternionf(0.f, 0.f, 1.f, 0.f), new Vector3f(1.f), "");
+        super(scene, EntityType.CAMERA, "", position, new Quaternionf(0.f, 0.f, 1.f, 0.f), new Vector3f(1.f), "");
         this.scene             = scene;
         this.front             = front;
         this.right             = new Vector3f();

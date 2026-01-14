@@ -109,7 +109,7 @@ public class Editor {
     }
 
     public void select() {
-        // check gizmo intersection first, if not, then check objects
+        // check gizmo intersection first, and return early if true
         if (this.gizmo != null) {
             if (this.gizmo.hovered_axis != null) {
                 this.gizmo.selected_axis = this.gizmo.hovered_axis;

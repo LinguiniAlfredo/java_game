@@ -1,6 +1,7 @@
 package org.delfino.renderer;
 
 import org.delfino.Context;
+import org.delfino.cameras.Camera;
 import org.delfino.entities.Model;
 import org.delfino.utils.Shader;
 import org.delfino.utils.Utils;
@@ -51,13 +52,13 @@ public class Skybox {
         this.shader.delete();
     }
 
-    public void render() {
+    public void render(Camera cam) {
         glDepthFunc(GL_LEQUAL);
         this.shader.use();
 
-        Matrix4f mat_view = Context.active_camera.get_view_matrix();
+        Matrix4f mat_view = cam.get_view_matrix();
         mat_view.setTranslation(0.f, 0.f, 0.f);
-        Matrix4f mat_proj = Context.active_camera.get_perspective_matrix();
+        Matrix4f mat_proj = cam.get_perspective_matrix();
 
         shader.set_mat4("view", mat_view);
         shader.set_mat4("projection", mat_proj);

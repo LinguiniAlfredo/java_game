@@ -68,14 +68,16 @@ public class Gizmo {
     }
 
     public void check_hovered(Vector3f ray) {
-        if (this.x_axis_volume.intersects(ray)) {
-            this.hovered_axis = Axis.X;
-        } else if (this.y_axis_volume.intersects(ray)) {
-            this.hovered_axis = Axis.Y;
-        } else if (this.z_axis_volume.intersects(ray)) {
-            this.hovered_axis = Axis.Z;
-        } else {
-            this.hovered_axis = null;
+        if (this.selected_axis == null) {
+            if (this.x_axis_volume.intersects(ray)) {
+                this.hovered_axis = Axis.X;
+            } else if (this.y_axis_volume.intersects(ray)) {
+                this.hovered_axis = Axis.Y;
+            } else if (this.z_axis_volume.intersects(ray)) {
+                this.hovered_axis = Axis.Z;
+            } else {
+                this.hovered_axis = null;
+            }
         }
     }
 
