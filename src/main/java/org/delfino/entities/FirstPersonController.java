@@ -49,7 +49,7 @@ public class FirstPersonController extends Entity {
 
     public FirstPersonController(Scene scene, Vector3f position, Quaternionf rotation, Vector3f scale) {
         super(scene, FIRST_PERSON_CONTROLLER, "", position, rotation, scale, "");
-        this.camera = new FPSCamera(Context.current_scene, this, position, new Vector3f(0.f, 0.f, 1.f));
+        this.camera = new FPSCamera(scene, this, position, new Vector3f(0.f, 0.f, 1.f));
         Context.active_camera = this.camera;
 
         this.collision = new Collision(position, width, height, depth);

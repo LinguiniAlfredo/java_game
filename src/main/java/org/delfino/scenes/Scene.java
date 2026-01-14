@@ -2,6 +2,7 @@ package org.delfino.scenes;
 
 import com.google.gson.*;
 import org.delfino.Context;
+import org.delfino.Gamemode;
 import org.delfino.cameras.StaticCamera;
 import org.delfino.entities.*;
 import org.delfino.renderer.Shadowmap;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Scene {
-    public TankController          player;
+    public FirstPersonController   player;
     public Skybox                  skybox;
     public LightCube               light_cube;
     public Shadowmap               shadow_map;
@@ -31,11 +32,6 @@ public class Scene {
         this.skybox     = new Skybox();
         this.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
         this.shadow_map = new Shadowmap();
-
-        Vector3f p = new Vector3f(0.f, 20.f, -20.f);
-        Vector3f f = new Vector3f(0.f, 0.f, 0.f).sub(p).normalize();
-        this.player = new TankController(this, new Vector3f(0.f, 1.f, 10.f));
-        this.entities.add(this.player);
 
         glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         load_scene_from_file();
@@ -62,7 +58,7 @@ public class Scene {
 
         for (Entity entity : this.entities) {
             entity.render();
-            if (Context.show_collisions) {
+            if (Context.show_collisions || (Context.gamemode == Gamemode.EDIT && entity.type == EntityType.FIRST_PERSON_CONTROLLER)) {
                 entity.render_collider();
             }
         }
@@ -128,12 +124,18 @@ public class Scene {
                         case "sphere":
                             this.entities.add(new Sphere(this, entity.position, entity.orientation, entity.scale));
                             break;
-                        case "player":
+                        case "first_person_controller":
                             if (this.player == null) {
-                                this.player = new TankController(this, entity.position, entity.orientation, entity.scale);
+                                this.player = new FirstPersonController(this, entity.position, entity.orientation, entity.scale);
                                 this.entities.add(this.player);
                             }
                             break;
+                        case "tank_controller":
+//                            if (this.player == null) {
+//                                this.player = new TankController(this, entity.position, entity.orientation, entity.scale);
+//                                this.entities.add(this.player);
+//                            }
+//                            break;
                         case "camera":
                             StaticCamera cam = new StaticCamera(this, entity.position, entity.front);
                             this.entities.add(cam);

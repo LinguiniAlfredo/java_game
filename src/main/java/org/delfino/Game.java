@@ -46,8 +46,8 @@ public class Game {
 
     private void init_context() {
         Context.gamemode        = GAME;
-        Context.screen_width    = 1920/2;
-        Context.screen_height   = 1080/2;
+        Context.screen_width    = 1920;
+        Context.screen_height   = 1080;
         Context.ticks_per_frame = 1000.f / 144.0f;
         Context.wireframe       = false;
         Context.show_shadow_map = false;
@@ -131,12 +131,12 @@ public class Game {
             prev_mouse_y = mouse_y[0];
 
             if (Context.gamemode != PAUSED) {
-                Context.current_scene.player.process_mouse_movement(x_offset, y_offset, delta_time);
+//                Context.current_scene.player.process_mouse_movement(x_offset, y_offset, delta_time);
                 Context.active_camera.process_mouse_movement(x_offset, y_offset, delta_time);
             }
         }
         if (!ImGui.getIO().getWantCaptureKeyboard()) {
-            Context.current_scene.player.process_keyboard();
+//            Context.current_scene.player.process_keyboard();
             Context.active_camera.process_keyboard();
         }
     }
