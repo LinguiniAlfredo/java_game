@@ -1,6 +1,5 @@
 package org.delfino.renderer;
 
-import org.delfino.Context;
 import org.delfino.cameras.Camera;
 import org.delfino.entities.Model;
 import org.delfino.utils.Shader;
@@ -23,11 +22,11 @@ import java.util.ArrayList;
 import static org.lwjgl.opengl.GL30.*;
 
 public class Skybox {
-    public int                 texture_id;
-    public Shader              shader;
+    public int textureId;
+    public Shader shader;
     public ArrayList<Vector3f> vertices;
-    public FloatBuffer         vertex_buffer;
-    public int                 VAO, VBO;
+    public FloatBuffer vertexBuffer;
+    public int VAO, VBO;
 
     public Skybox() {
         ArrayList<String> faces = new ArrayList<>();
@@ -38,17 +37,17 @@ public class Skybox {
         faces.add("textures/skyboxes/front.jpg");
         faces.add("textures/skyboxes/back.jpg");
 
-        load_texture(faces);
-        this.shader        = new Shader("shaders/skybox.vert", "shaders/skybox.frag");
-        this.vertices      = get_vertices();
-        this.vertex_buffer = Utils.vertices_3f_to_fb(this.vertices);
+        loadTexture(faces);
+        this.shader = new Shader("shaders/skybox.vert", "shaders/skybox.frag");
+        this.vertices = getVertices();
+        this.vertexBuffer = Utils.vertices3FToFb(this.vertices);
         init();
     }
 
     public void delete() {
         glDeleteVertexArrays(this.VAO);
         glDeleteBuffers(this.VBO);
-        glDeleteTextures(this.texture_id);
+        glDeleteTextures(this.textureId);
         this.shader.delete();
     }
 
@@ -56,46 +55,46 @@ public class Skybox {
         glDepthFunc(GL_LEQUAL);
         this.shader.use();
 
-        Matrix4f mat_view = cam.get_view_matrix();
-        mat_view.setTranslation(0.f, 0.f, 0.f);
-        Matrix4f mat_proj = cam.get_perspective_matrix();
+        Matrix4f matView = cam.getViewMatrix();
+        matView.setTranslation(0.f, 0.f, 0.f);
+        Matrix4f matProj = cam.getPerspectiveMatrix();
 
-        shader.set_mat4("view", mat_view);
-        shader.set_mat4("projection", mat_proj);
+        shader.setMat4("view", matView);
+        shader.setMat4("projection", matProj);
 
         glBindVertexArray(this.VAO);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, this.texture_id);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, this.textureId);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glDepthFunc(GL_LESS);
     }
 
-    private void load_texture(ArrayList<String> faces) {
-        this.texture_id = glGenTextures();
-        glBindTexture(GL_TEXTURE_CUBE_MAP, this.texture_id);
+    private void loadTexture(ArrayList<String> faces) {
+        this.textureId = glGenTextures();
+        glBindTexture(GL_TEXTURE_CUBE_MAP, this.textureId);
 
         for (int i = 0; i < faces.size(); i++) {
             try (InputStream input_stream = Model.class.getClassLoader().getResourceAsStream(faces.get(i))) {
-                Path temp_file = Files.createTempFile("texture-", ".jpg");
-                temp_file.toFile().deleteOnExit();
+                Path tempFile = Files.createTempFile("texture-", ".jpg");
+                tempFile.toFile().deleteOnExit();
 
-                try (BufferedOutputStream output_stream = new BufferedOutputStream(Files.newOutputStream(temp_file))) {
+                try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(tempFile))) {
                     byte[] buffer = new byte[1024];
-                    int bytes_read;
-                    while ((bytes_read = input_stream.read(buffer)) != -1) {
-                        output_stream.write(buffer, 0, bytes_read);
+                    int bytesRead;
+                    while ((bytesRead = input_stream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
                     }
                 }
 
-                IntBuffer width_buffer = BufferUtils.createIntBuffer(1);
-                IntBuffer height_buffer = BufferUtils.createIntBuffer(1);
-                IntBuffer component_buffer = BufferUtils.createIntBuffer(1);
+                IntBuffer widthBuffer = BufferUtils.createIntBuffer(1);
+                IntBuffer heightBuffer = BufferUtils.createIntBuffer(1);
+                IntBuffer componentBuffer = BufferUtils.createIntBuffer(1);
 
-                ByteBuffer data = STBImage.stbi_load(temp_file.toFile().getAbsolutePath(), width_buffer, height_buffer, component_buffer, 0);
+                ByteBuffer data = STBImage.stbi_load(tempFile.toFile().getAbsolutePath(), widthBuffer, heightBuffer, componentBuffer, 0);
 
                 if (data != null) {
-                    int width = width_buffer.get(0);
-                    int height = height_buffer.get(0);
-                    int components = component_buffer.get(0);
+                    int width = widthBuffer.get(0);
+                    int height = heightBuffer.get(0);
+                    int components = componentBuffer.get(0);
 
                     int format;
                     if (components == 1) {
@@ -124,7 +123,7 @@ public class Skybox {
         }
     }
 
-    private ArrayList<Vector3f> get_vertices() {
+    private ArrayList<Vector3f> getVertices() {
         ArrayList<Vector3f> vertices = new ArrayList<>();
         vertices.add(new Vector3f(-1.0f,  1.0f, -1.0f));
         vertices.add(new Vector3f(-1.0f, -1.0f, -1.0f));
@@ -172,7 +171,7 @@ public class Skybox {
         glBindVertexArray(this.VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, this.VBO);
-        glBufferData(GL_ARRAY_BUFFER, this.vertex_buffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, this.vertexBuffer, GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, false, Float.BYTES * 3, 0);
         glEnableVertexAttribArray(0);

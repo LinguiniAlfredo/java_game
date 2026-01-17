@@ -14,10 +14,10 @@ import static org.lwjgl.opengl.GL30.*;
 public class LightCube {
     public Vector3f position;
     public float[] vertices;
-    public FloatBuffer vertex_buffer;
+    public FloatBuffer vertexBuffer;
     public Shader shader;
     public int VAO, VBO;
-    public Matrix4f mat_model = new Matrix4f();
+    public Matrix4f matModel = new Matrix4f();
 
     public LightCube(Vector3f position) {
         this.vertices = new float[]{
@@ -63,7 +63,7 @@ public class LightCube {
                 -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
                 -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
         };
-        this.vertex_buffer = Utils.float_arr_to_fb(this.vertices);
+        this.vertexBuffer = Utils.floatArrToFb(this.vertices);
         this.position = position;
         this.shader = new Shader("shaders/lightcube.vert", "shaders/lightcube.frag");
         init();
@@ -77,12 +77,12 @@ public class LightCube {
 
     public void render() {
         this.shader.use();
-        mat_model.identity().translate(this.position);
-        Matrix4f mat_view = Context.active_camera.get_view_matrix();
-        Matrix4f mat_proj = Context.active_camera.get_perspective_matrix();
-        this.shader.set_mat4("model", mat_model);
-        this.shader.set_mat4("view", mat_view);
-        this.shader.set_mat4("projection", mat_proj);
+        matModel.identity().translate(this.position);
+        Matrix4f matView = Context.activeCamera.getViewMatrix();
+        Matrix4f matProj = Context.activeCamera.getPerspectiveMatrix();
+        this.shader.setMat4("model", matModel);
+        this.shader.setMat4("view", matView);
+        this.shader.setMat4("projection", matProj);
         glBindVertexArray(this.VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);

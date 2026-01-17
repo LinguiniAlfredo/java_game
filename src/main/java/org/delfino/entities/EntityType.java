@@ -8,7 +8,7 @@ public enum EntityType {
     TANK_CONTROLLER,
     CAMERA;
 
-    public static String[] to_string_array() {
+    public static String[] toStringArray() {
         EntityType[] values = EntityType.values();
         String[] names = new String[values.length];
 

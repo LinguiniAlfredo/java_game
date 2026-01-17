@@ -28,8 +28,8 @@ public class FPSCamera extends Camera {
     }
 
     @Override
-    public void update(double delta_time) {
-        update_camera_vectors();
+    public void update(double deltaTime) {
+        updateCameraVectors();
         if (this.firstPersonController != null) {
             this.position = new Vector3f(this.firstPersonController.position.x, this.firstPersonController.position.y + this.head_height, this.firstPersonController.position.z);
         }
@@ -37,32 +37,32 @@ public class FPSCamera extends Camera {
 
     @Override
     public void process_keyboard() {
-        this.input_vector.zero();
+        this.inputVector.zero();
         this.firstPersonController.movement_speed = SPEED;
 
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS) {
-            this.input_vector.z = 1;
+            this.inputVector.z = 1;
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_A) == GLFW.GLFW_PRESS) {
-            this.input_vector.x = -1;
+            this.inputVector.x = -1;
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_S) == GLFW.GLFW_PRESS) {
-            this.input_vector.z = -1;
+            this.inputVector.z = -1;
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS) {
-            this.input_vector.x = 1;
+            this.inputVector.x = 1;
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS) {
             this.firstPersonController.movement_speed = SPEED * 2;
         }
 
-        if (this.input_vector.x != 0 || this.input_vector.y != 0 || this.input_vector.z != 0) {
-            this.input_vector.normalize();
+        if (this.inputVector.x != 0 || this.inputVector.y != 0 || this.inputVector.z != 0) {
+            this.inputVector.normalize();
         }
     }
 
     @Override
-    public void update_camera_vectors() {
+    public void updateCameraVectors() {
         // we update the vectors once without pitch so movement trajectory is bound to the plane
         // then update vectors again with pitch for looking around
         float yaw_rad   = (float) Math.toRadians(this.yaw);
@@ -77,14 +77,14 @@ public class FPSCamera extends Camera {
             ).normalize();
         }
 
-        this.front.cross(this.world_up, this.right).normalize();
+        this.front.cross(this.worldUp, this.right).normalize();
         this.right.cross(this.front, this.up).normalize();
 
         if (this.firstPersonController != null) {
             this.firstPersonController.trajectory.zero();
-            this.firstPersonController.trajectory.fma(input_vector.x, right)
-                    .fma(input_vector.y, up)
-                    .fma(input_vector.z, front);
+            this.firstPersonController.trajectory.fma(inputVector.x, right)
+                    .fma(inputVector.y, up)
+                    .fma(inputVector.z, front);
         }
 
         if (yaw_rad != 0 || pitch_rad != 0) {
@@ -95,7 +95,7 @@ public class FPSCamera extends Camera {
             ).normalize();
         }
 
-        this.front.cross(this.world_up, this.right).normalize();
+        this.front.cross(this.worldUp, this.right).normalize();
         this.right.cross(this.front, this.up).normalize();
     }
 }

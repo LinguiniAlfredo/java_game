@@ -14,7 +14,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class EditorCamera extends Camera {
 
     public CameraMode mode;
-    public CameraMode prev_mode;
+    public CameraMode prevMode;
     private Editor    editor;
     public  Vector3f  ray;
 
@@ -30,8 +30,8 @@ public class EditorCamera extends Camera {
     }
 
     @Override
-    public void update(double delta_time) {
-        super.update(delta_time);
+    public void update(double deltaTime) {
+        super.update(deltaTime);
         if (this.mode == CameraMode.FLY) {
             glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         } else {
@@ -54,7 +54,7 @@ public class EditorCamera extends Camera {
                 super.process_mouse_movement(offset_x, offset_y, delta_time);
                 break;
             case SELECT:
-                editor.process_mouse_movement(offset_x, offset_y, delta_time);
+                editor.processMouseMovement(offset_x, offset_y, delta_time);
                 break;
             case ORBIT:
         }
@@ -62,28 +62,28 @@ public class EditorCamera extends Camera {
 
     private void cast_ray() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            DoubleBuffer mouse_x = stack.mallocDouble(1);
-            DoubleBuffer mouse_y = stack.mallocDouble(1);
-            glfwGetCursorPos(Context.window, mouse_x, mouse_y);
+            DoubleBuffer mouseX = stack.mallocDouble(1);
+            DoubleBuffer mouseY = stack.mallocDouble(1);
+            glfwGetCursorPos(Context.window, mouseX, mouseY);
 
-            float ndc_mouse_x = (float) (2.f * mouse_x.get(0) / Context.screen_width - 1.f);
-            float ndc_mouse_y = (float) (1.f - 2.f * mouse_y.get(0) / Context.screen_height);
-            this.ray = get_ray_from_mouse(ndc_mouse_x, ndc_mouse_y);
+            float ndcMouseX = (float) (2.f * mouseX.get(0) / Context.screenWidth - 1.f);
+            float ndcMouseY = (float) (1.f - 2.f * mouseY.get(0) / Context.screenHeight);
+            this.ray = getRayFromMouse(ndcMouseX, ndcMouseY);
         }
     }
 
 
-    private Vector3f get_ray_from_mouse(float ndc_mouse_x, float ndc_mouse_y) {
-        Vector4f ray_clip = new Vector4f(ndc_mouse_x, ndc_mouse_y, -1, 0);
-        Vector4f ray_eye  = ray_clip.mul(Context.active_camera.get_perspective_matrix().invert());
-        ray_eye.z = -1.f;
-        ray_eye.w =  0.f;
-        Vector4f tmp = ray_eye.mul(Context.active_camera.get_view_matrix().invert());
+    private Vector3f getRayFromMouse(float ndcMouseX, float ndcMouseY) {
+        Vector4f rayClip = new Vector4f(ndcMouseX, ndcMouseY, -1, 0);
+        Vector4f rayEye  = rayClip.mul(Context.activeCamera.getPerspectiveMatrix().invert());
+        rayEye.z = -1.f;
+        rayEye.w =  0.f;
+        Vector4f tmp = rayEye.mul(Context.activeCamera.getViewMatrix().invert());
         return new Vector3f(tmp.x, tmp.y, tmp.z).normalize();
     }
 
     public void set_mode(CameraMode mode) {
-        this.prev_mode = this.mode;
+        this.prevMode = this.mode;
         this.mode = mode;
     }
 }

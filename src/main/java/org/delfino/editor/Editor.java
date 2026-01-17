@@ -2,7 +2,6 @@ package org.delfino.editor;
 
 import imgui.ImGui;
 import org.delfino.Context;
-import org.delfino.cameras.Camera;
 import org.delfino.cameras.StaticCamera;
 import org.delfino.editor.menus.ObjectListMenu;
 import org.delfino.editor.menus.PropertiesMenu;
@@ -17,20 +16,20 @@ public class Editor {
     public EditorCamera   camera;
     public Gizmo          gizmo;
     public Gridlines      gridlines;
-    public Entity         selected_object;
-    public PropertiesMenu properties_menu;
-    public ObjectListMenu object_list_menu;
+    public Entity         selectedObject;
+    public PropertiesMenu propertiesMenu;
+    public ObjectListMenu objectListMenu;
     public Compass        compass;
 
     public Editor() {
         Vector3f p            = new Vector3f(40.f, 20.f, 0.f);
         Vector3f f            = new Vector3f(0.f, 0.f, 0.f).sub(p).normalize();
-        this.camera           = new EditorCamera(Context.current_scene, this, p, f);
+        this.camera           = new EditorCamera(Context.currentScene, this, p, f);
         this.gridlines        = new Gridlines();
-        this.object_list_menu = new ObjectListMenu(this, Context.current_scene.entities);
+        this.objectListMenu   = new ObjectListMenu(this, Context.currentScene.entities);
         this.compass          = new Compass(this);
 
-        Context.active_camera = this.camera;
+        Context.activeCamera = this.camera;
     }
 
     public void delete() {
@@ -51,134 +50,134 @@ public class Editor {
     }
 
     public void render() {
-        Context.gui_glfw.newFrame();
-        Context.gui_gl3.newFrame();
+        Context.guiGlfw.newFrame();
+        Context.guiGl3.newFrame();
         ImGui.newFrame();
 
-        this.object_list_menu.render();
-        if (this.selected_object != null) {
-            this.properties_menu.render();
-            if (this.selected_object.type == EntityType.CAMERA) {
-                StaticCamera cam = (StaticCamera) this.selected_object;
+        this.objectListMenu.render();
+        if (this.selectedObject != null) {
+            this.propertiesMenu.render();
+            if (this.selectedObject.type == EntityType.CAMERA) {
+                StaticCamera cam = (StaticCamera) this.selectedObject;
                 cam.render_viewport();
             }
         }
         this.compass.render();
 
-        render_gizmo();
+        renderGizmo();
 //        this.gridlines.render();
 
         ImGui.render();
-        Context.gui_gl3.renderDrawData(ImGui.getDrawData());
+        Context.guiGl3.renderDrawData(ImGui.getDrawData());
     }
 
-    private void render_gizmo() {
-        if (this.selected_object != null) {
+    private void renderGizmo() {
+        if (this.selectedObject != null) {
             if (this.gizmo == null) {
-                this.gizmo = new TranslateGizmo(this, selected_object.position);
+                this.gizmo = new TranslateGizmo(this, selectedObject.position);
             }
             this.gizmo.render();
-            if (Context.show_collisions) {
+            if (Context.showCollisions) {
                 this.gizmo.render_collisions();
             }
         }
     }
 
-    public void set_selected_object(Entity object) {
-        deselect_object();
+    public void setSelectedObject(Entity object) {
+        deselectObject();
 
         object.selected = true;
-        this.selected_object = object;
+        this.selectedObject = object;
         if (this.gizmo != null) {
             this.gizmo.delete();
             this.gizmo = null;
         }
-        this.properties_menu = new PropertiesMenu(selected_object);
+        this.propertiesMenu = new PropertiesMenu(selectedObject);
     }
 
-    private void deselect_object() {
-        if (this.selected_object != null) {
-            this.selected_object.selected = false;
-            this.selected_object = null;
+    private void deselectObject() {
+        if (this.selectedObject != null) {
+            this.selectedObject.selected = false;
+            this.selectedObject = null;
         }
         if (this.gizmo != null) {
             this.gizmo.delete();
             this.gizmo = null;
         }
-        this.properties_menu = null;
+        this.propertiesMenu = null;
     }
 
     public void select() {
         // check gizmo intersection first, and return early if true
         if (this.gizmo != null) {
-            if (this.gizmo.hovered_axis != null) {
-                this.gizmo.selected_axis = this.gizmo.hovered_axis;
+            if (this.gizmo.hoveredAxis != null) {
+                this.gizmo.selectedAxis = this.gizmo.hoveredAxis;
                 return;
             }
         }
 
         ArrayList<Entity> intersecting_objects = new ArrayList<>();
-        for (Entity object : Context.current_scene.entities) {
+        for (Entity object : Context.currentScene.entities) {
             object.selected = false;
             if (object.collision.intersects(this.camera.ray)) {
                 intersecting_objects.add(object);
             }
         }
         if (intersecting_objects.isEmpty()) {
-            deselect_object();
+            deselectObject();
         }
 
         float min_dist = Float.MAX_VALUE;
         for (Entity object : intersecting_objects) {
-            float dist = object.position.distance(Context.active_camera.position);
+            float dist = object.position.distance(Context.activeCamera.position);
             if (dist < min_dist) {
                 min_dist = dist;
             }
         }
         for (Entity object : intersecting_objects) {
-            float dist = object.position.distance(Context.active_camera.position);
+            float dist = object.position.distance(Context.activeCamera.position);
             if (dist == min_dist) {
-                set_selected_object(object);
+                setSelectedObject(object);
             }
         }
     }
 
-    public void release_gizmo() {
+    public void releaseGizmo() {
         if (this.gizmo != null) {
-            if (this.gizmo.selected_axis != null) {
-                this.gizmo.selected_axis = null;
+            if (this.gizmo.selectedAxis != null) {
+                this.gizmo.selectedAxis = null;
             }
         }
     }
 
-    public void process_mouse_movement(double offset_x, double offset_y, double delta_time) {
+    public void processMouseMovement(double offset_x, double offset_y, double delta_time) {
         if (gizmo != null) {
-            this.gizmo.transform_object(selected_object, offset_x, offset_y, delta_time);
+            this.gizmo.transform_object(selectedObject, offset_x, offset_y, delta_time);
         }
     }
 
-    public void find_object() {
-        if (this.selected_object != null && this.camera.mode == CameraMode.SELECT) {
-            Vector3f object_position = new Vector3f(this.selected_object.position);
-            this.camera.position = object_position.sub(new Vector3f(10.f, 10.f, -10.f));
-            this.camera.look_at(object_position);
+    public void findObject() {
+        if (this.selectedObject != null && this.camera.mode == CameraMode.SELECT) {
+            Vector3f objectPosition = new Vector3f(this.selectedObject.position);
+            this.camera.position = objectPosition.sub(new Vector3f(10.f, 10.f, -10.f));
+            this.camera.lookAt(objectPosition);
         }
     }
 
-    public void delete_object() {
-        if (this.selected_object != null) {
-            Context.current_scene.entities.remove(this.selected_object);
-            deselect_object();
+    public void deleteObject() {
+        if (this.selectedObject != null) {
+            Context.currentScene.entities.remove(this.selectedObject);
+            deselectObject();
         }
     }
 
-    public void duplicate_object() {
-        if (this.selected_object != null) {
-            Context.current_scene.add_entity(
-                    this.selected_object.type,
-                    new Vector3f(this.selected_object.position),
-                    new Quaternionf(this.selected_object.orientation),
-                    new Vector3f(this.selected_object.scale)
+    public void duplicateObject() {
+        if (this.selectedObject != null) {
+            Context.currentScene.add_entity(
+                    this.selectedObject.type,
+                    new Vector3f(this.selectedObject.position),
+                    new Quaternionf(this.selectedObject.orientation),
+                    new Vector3f(this.selectedObject.scale)
             );
         }
     }

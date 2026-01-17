@@ -1,9 +1,7 @@
 package org.delfino.entities;
 
 import org.apache.commons.io.FilenameUtils;
-import org.delfino.Context;
 import org.delfino.cameras.Camera;
-import org.delfino.cameras.StaticCamera;
 import org.delfino.utils.Shader;
 import org.delfino.utils.Texture;
 import org.delfino.utils.Vertex;
@@ -16,7 +14,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -30,15 +27,15 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Model {
     ArrayList<Mesh>    meshes = new ArrayList<>();
-    ArrayList<Texture> textures_loaded = new ArrayList<>();
-    String             model_path;
-    String             texture_path;
+    ArrayList<Texture> texturesLoaded = new ArrayList<>();
+    String modelPath;
+    String texturePath;
 
-    public Model(String model_path, String texture_path) {
-        this.model_path   = model_path;
-        this.texture_path = texture_path;
-        if (model_path != "") {
-            load_model();
+    public Model(String modelPath, String texturePath) {
+        this.modelPath = modelPath;
+        this.texturePath = texturePath;
+        if (modelPath != "") {
+            loadModel();
         }
     }
 
@@ -59,15 +56,15 @@ public class Model {
         }
     }
 
-    public void render_shadow_map(Shader shadow_map_shader, Vector3f position, Quaternionf orientation, Vector3f scale) {
+    public void renderShadowMap(Shader shadow_map_shader, Vector3f position, Quaternionf orientation, Vector3f scale) {
         for (Mesh mesh : this.meshes) {
-            mesh.render_shadow_map(shadow_map_shader, position, orientation, scale);
+            mesh.renderShadowMap(shadow_map_shader, position, orientation, scale);
         }
     }
 
-    private void load_model() {
-        try (InputStream input_stream = Model.class.getClassLoader().getResourceAsStream(this.model_path)) {
-            Path temp_file = Files.createTempFile("model-", FilenameUtils.getExtension(this.model_path));
+    private void loadModel() {
+        try (InputStream input_stream = Model.class.getClassLoader().getResourceAsStream(this.modelPath)) {
+            Path temp_file = Files.createTempFile("model-", FilenameUtils.getExtension(this.modelPath));
             temp_file.toFile().deleteOnExit();
 
             try (BufferedOutputStream output_stream = new BufferedOutputStream(Files.newOutputStream(temp_file))) {
@@ -82,7 +79,7 @@ public class Model {
                 if (scene == null || (scene.mFlags() & Assimp.AI_SCENE_FLAGS_INCOMPLETE) != 0 || scene.mRootNode() == null) {
                     throw new Exception();
                 }
-                process_node(scene.mRootNode(), scene);
+                processNode(scene.mRootNode(), scene);
             } catch (Exception e) {
                 System.out.println("failed to load model file...");
             }
@@ -91,7 +88,7 @@ public class Model {
         }
     }
 
-    private void process_node(AINode node, AIScene scene) {
+    private void processNode(AINode node, AIScene scene) {
         if (node == null) {
             System.out.println("found null node...skipping");
             return;
@@ -112,7 +109,7 @@ public class Model {
             return;
         }
         for (int i = 0; i < node.mNumChildren(); i++) {
-            process_node(AINode.create(Objects.requireNonNull(node.mChildren()).get(i)), scene);
+            processNode(AINode.create(Objects.requireNonNull(node.mChildren()).get(i)), scene);
         }
     }
 
@@ -140,10 +137,10 @@ public class Model {
             if (mesh.mTextureCoords(0) != null) {
                 AIVector3D.Buffer tc = mesh.mTextureCoords(0);
                 if (tc != null) {
-                    vertex.tex_coords = new Vector2f(tc.get(i).x(), tc.get(i).y());
+                    vertex.texCoords = new Vector2f(tc.get(i).x(), tc.get(i).y());
                 }
             } else {
-                vertex.tex_coords = new Vector2f();
+                vertex.texCoords = new Vector2f();
             }
 
             vertices.add(vertex);
@@ -156,41 +153,41 @@ public class Model {
             }
         }
 
-        if (!texture_path.isEmpty()) {
+        if (!texturePath.isEmpty()) {
             Texture texture = new Texture();
-            texture.id   = texture_from_file(this.texture_path);
+            texture.id   = textureFromFile(this.texturePath);
             texture.type = "";
-            texture.path = this.texture_path;
+            texture.path = this.texturePath;
             textures.add(texture);
         }
 
         return new Mesh(vertices, indices, textures);
     }
 
-    private int texture_from_file(String texture_path) {
-        try (InputStream input_stream = Model.class.getClassLoader().getResourceAsStream(this.texture_path)) {
-            Path temp_file = Files.createTempFile("texture-", ".png");
-            temp_file.toFile().deleteOnExit();
+    private int textureFromFile(String texturePath) {
+        try (InputStream input_stream = Model.class.getClassLoader().getResourceAsStream(this.texturePath)) {
+            Path tempFile = Files.createTempFile("texture-", ".png");
+            tempFile.toFile().deleteOnExit();
 
-            try (BufferedOutputStream output_stream = new BufferedOutputStream(Files.newOutputStream(temp_file))) {
+            try (BufferedOutputStream output_stream = new BufferedOutputStream(Files.newOutputStream(tempFile))) {
                 byte[] buffer = new byte[1024];
-                int bytes_read;
-                while ((bytes_read = input_stream.read(buffer)) != -1) {
-                    output_stream.write(buffer, 0, bytes_read);
+                int bytesRead;
+                while ((bytesRead = input_stream.read(buffer)) != -1) {
+                    output_stream.write(buffer, 0, bytesRead);
                 }
             }
-            int texture_id = glGenTextures();
+            int textureId = glGenTextures();
 
-            IntBuffer width_buffer = BufferUtils.createIntBuffer(1);
-            IntBuffer height_buffer = BufferUtils.createIntBuffer(1);
-            IntBuffer component_buffer = BufferUtils.createIntBuffer(1);
+            IntBuffer widthBuffer = BufferUtils.createIntBuffer(1);
+            IntBuffer heightBuffer = BufferUtils.createIntBuffer(1);
+            IntBuffer componentBuffer = BufferUtils.createIntBuffer(1);
 
-            ByteBuffer data = STBImage.stbi_load(temp_file.toFile().getAbsolutePath(), width_buffer, height_buffer, component_buffer, 0);
+            ByteBuffer data = STBImage.stbi_load(tempFile.toFile().getAbsolutePath(), widthBuffer, heightBuffer, componentBuffer, 0);
 
             if (data != null) {
-                int width = width_buffer.get(0);
-                int height = height_buffer.get(0);
-                int components = component_buffer.get(0);
+                int width = widthBuffer.get(0);
+                int height = heightBuffer.get(0);
+                int components = componentBuffer.get(0);
 
                 int format;
                 if (components == 1) {
@@ -203,7 +200,7 @@ public class Model {
                     throw new RuntimeException("unsupported number of image components...");
                 }
 
-                glBindTexture(GL_TEXTURE_2D, texture_id);
+                glBindTexture(GL_TEXTURE_2D, textureId);
                 glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
                 glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -217,7 +214,7 @@ public class Model {
                 System.out.println("error loading texture...");
             }
 
-            return texture_id;
+            return textureId;
 
         } catch (IOException e) {
             throw new RuntimeException("failed to find texture file...");

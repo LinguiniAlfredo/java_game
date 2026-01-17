@@ -20,32 +20,32 @@ import java.util.ArrayList;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Scene {
-    public FirstPersonController   player;
-    public Skybox                  skybox;
-    public LightCube               light_cube;
-    public Shadowmap               shadow_map;
-    public String                  filename;
-    public ArrayList<Entity>       entities = new ArrayList<>();
+    public FirstPersonController player;
+    public Skybox skybox;
+    public LightCube lightCube;
+    public Shadowmap shadowMap;
+    public String filename;
+    public ArrayList<Entity> entities = new ArrayList<>();
 
     public Scene(String filename) {
-        this.filename   = filename;
-        this.skybox     = new Skybox();
-        this.light_cube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
-        this.shadow_map = new Shadowmap();
+        this.filename = filename;
+        this.skybox = new Skybox();
+        this.lightCube = new LightCube(new Vector3f(-25.f, 25.f, -25.f));
+        this.shadowMap = new Shadowmap();
 
         glfwSetInputMode(Context.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        load_scene_from_file();
+        loadSceneFromFile();
     }
 
-    public void reset_colliders() {
+    public void resetColliders() {
         for (Entity entity : this.entities) {
             entity.collision.reset();
         }
     }
 
     public void update(double delta_time) {
-        if (Context.show_collisions) {
-            reset_colliders();
+        if (Context.showCollisions) {
+            resetColliders();
         }
         for (Entity entity : this.entities) {
             entity.update(delta_time);
@@ -53,27 +53,27 @@ public class Scene {
     }
 
     public void render() {
-        this.shadow_map.do_pass();
-        this.light_cube.render();
+        this.shadowMap.doPass();
+        this.lightCube.render();
 
         for (Entity entity : this.entities) {
             entity.render();
-            if (Context.show_collisions || (Context.gamemode == Gamemode.EDIT && entity.type == EntityType.FIRST_PERSON_CONTROLLER)) {
-                entity.render_collider();
+            if (Context.showCollisions || (Context.gamemode == Gamemode.EDIT && entity.type == EntityType.FIRST_PERSON_CONTROLLER)) {
+                entity.renderCollider();
             }
         }
 
-        if (Context.show_shadow_map) {
-            this.shadow_map.render_depth_quad();
+        if (Context.showShadowMap) {
+            this.shadowMap.renderDepthQuad();
         }
 
-        this.skybox.render(Context.active_camera);
+        this.skybox.render(Context.activeCamera);
     }
 
     public void delete() {
-        this.light_cube.delete();
+        this.lightCube.delete();
         this.skybox.delete();
-        this.shadow_map.delete();
+        this.shadowMap.delete();
 
         for (Entity entity : this.entities) {
             entity.delete();
@@ -109,7 +109,7 @@ public class Scene {
         this.add_entity(type, new Vector3f(), new Quaternionf(), new Vector3f(1.f));
     }
 
-    private void load_scene_from_file() {
+    private void loadSceneFromFile() {
         Gson gson = new Gson();
         try(FileReader reader = new FileReader(this.filename)) {
             JsonElement root = JsonParser.parseReader(reader);
@@ -139,7 +139,7 @@ public class Scene {
                         case "camera":
                             StaticCamera cam = new StaticCamera(this, entity.position, entity.front);
                             this.entities.add(cam);
-                            Context.active_camera = cam;
+                            Context.activeCamera = cam;
                             break;
                     }
                 }
@@ -150,26 +150,26 @@ public class Scene {
         }
     }
 
-    public void save_scene_to_file() {
+    public void saveSceneToFile() {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .disableHtmlEscaping()
                 .create();
 
-        JsonArray json_array = new JsonArray();
-        String saved_file = this.filename;
+        JsonArray jsonArray = new JsonArray();
+        String savedFile = this.filename;
         for (int i = 0; i < this.entities.size(); i++) {
             EntityDTO dto = new EntityDTO(this.entities.get(i), i);
-            json_array.add(gson.toJsonTree(dto));
+            jsonArray.add(gson.toJsonTree(dto));
         }
 
         try {
-            Path path = Paths.get(saved_file);
+            Path path = Paths.get(savedFile);
             if (!Files.exists(path)) {
                 Files.createFile(path);
             }
             Writer writer = Files.newBufferedWriter(path);
-            gson.toJson(json_array, writer);
+            gson.toJson(jsonArray, writer);
             writer.close();
 
         } catch (IOException e) {

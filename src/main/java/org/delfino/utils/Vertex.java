@@ -6,5 +6,5 @@ import org.joml.Vector3f;
 public class Vertex {
     public Vector3f position;
     public Vector3f normal;
-    public Vector2f tex_coords;
+    public Vector2f texCoords;
 }

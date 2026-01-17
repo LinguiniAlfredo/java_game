@@ -22,7 +22,7 @@ public class Camera extends Entity {
 
     static class Frustrum {
         float fov    = (float) Math.toRadians(45.f);
-        float aspect = (float) Context.screen_width / Context.screen_height;
+        float aspect = (float) Context.screenWidth / Context.screenHeight;
         float near   = 0.1f;
         float far    = 1000.f;
     }
@@ -31,129 +31,129 @@ public class Camera extends Entity {
     public Vector3f front;
     public Vector3f up;
     public Vector3f right;
-    public Vector3f world_up;
+    public Vector3f worldUp;
     public Vector3f trajectory;
-    public Vector3f input_vector;
+    public Vector3f inputVector;
 
-    private final Matrix4f view_matrix = new Matrix4f();
-    private final Matrix4f proj_matrix = new Matrix4f();
+    private final Matrix4f viewMatrix = new Matrix4f();
+    private final Matrix4f projMatrix = new Matrix4f();
 
     public float yaw;
     public float pitch;
-    public float movement_speed;
-    public float mouse_sensitivity;
+    public float movementSpeed;
+    public float mouseSensitivity;
     public float zoom;
 
     public Frustrum frustrum;
 
     public Camera(Scene scene, Vector3f position) {
-        this.scene             = scene;
-        this.position          = position;
-        this.front             = new Vector3f(0.f, 0.f, -1.f);
-        this.right             = new Vector3f();
-        this.up                = new Vector3f();
-        this.world_up          = new Vector3f(0.f, 1.f, 0.f);
-        this.trajectory        = new Vector3f();
-        this.input_vector      = new Vector3f();
-        this.yaw               = YAW;
-        this.pitch             = PITCH;
-        this.movement_speed    = SPEED;
-        this.mouse_sensitivity = SENSITIVITY;
-        this.zoom              = ZOOM;
-        this.frustrum          = new Frustrum();
+        this.scene            = scene;
+        this.position         = position;
+        this.front            = new Vector3f(0.f, 0.f, -1.f);
+        this.right            = new Vector3f();
+        this.up               = new Vector3f();
+        this.worldUp          = new Vector3f(0.f, 1.f, 0.f);
+        this.trajectory       = new Vector3f();
+        this.inputVector      = new Vector3f();
+        this.yaw              = YAW;
+        this.pitch            = PITCH;
+        this.movementSpeed    = SPEED;
+        this.mouseSensitivity = SENSITIVITY;
+        this.zoom             = ZOOM;
+        this.frustrum         = new Frustrum();
 
-        update_camera_vectors();
+        updateCameraVectors();
     }
 
     public Camera(Scene scene, Vector3f position, Vector3f front) {
         super(scene, EntityType.CAMERA, "", position, new Quaternionf(0.f, 0.f, 1.f, 0.f), new Vector3f(1.f), "");
-        this.scene             = scene;
-        this.front             = front;
-        this.right             = new Vector3f();
-        this.up                = new Vector3f();
-        this.world_up          = new Vector3f(0.f, 1.f, 0.f);
-        this.trajectory        = new Vector3f();
-        this.input_vector      = new Vector3f();
-        this.yaw               = YAW;
-        this.pitch             = PITCH;
-        this.movement_speed    = SPEED;
-        this.mouse_sensitivity = SENSITIVITY;
-        this.zoom              = ZOOM;
-        this.frustrum          = new Frustrum();
+        this.scene            = scene;
+        this.front            = front;
+        this.right            = new Vector3f();
+        this.up               = new Vector3f();
+        this.worldUp          = new Vector3f(0.f, 1.f, 0.f);
+        this.trajectory       = new Vector3f();
+        this.inputVector      = new Vector3f();
+        this.yaw              = YAW;
+        this.pitch            = PITCH;
+        this.movementSpeed    = SPEED;
+        this.mouseSensitivity = SENSITIVITY;
+        this.zoom             = ZOOM;
+        this.frustrum         = new Frustrum();
 
-        update_camera_vectors();
+        updateCameraVectors();
     }
 
     public Camera(Camera other) {
-        this.scene             = other.scene;
-        this.position          = other.position;
-        this.front             = other.front;
-        this.up                = other.up;
-        this.right             = other.right;
-        this.world_up          = new Vector3f(0.f, 1.f, 0.f);
-        this.trajectory        = other.trajectory;
-        this.input_vector      = other.input_vector;
-        this.yaw               = other.yaw;
-        this.pitch             = other.pitch;
-        this.movement_speed    = other.movement_speed;
-        this.mouse_sensitivity = other.mouse_sensitivity;
-        this.zoom              = other.zoom;
-        this.frustrum          = other.frustrum;
+        this.scene            = other.scene;
+        this.position         = other.position;
+        this.front            = other.front;
+        this.up               = other.up;
+        this.right            = other.right;
+        this.worldUp          = new Vector3f(0.f, 1.f, 0.f);
+        this.trajectory       = other.trajectory;
+        this.inputVector      = other.inputVector;
+        this.yaw              = other.yaw;
+        this.pitch            = other.pitch;
+        this.movementSpeed    = other.movementSpeed;
+        this.mouseSensitivity = other.mouseSensitivity;
+        this.zoom             = other.zoom;
+        this.frustrum         = other.frustrum;
     }
 
-    public void update(double delta_time) {
-        update_camera_vectors();
-        float scale = this.movement_speed * (float) delta_time;
+    public void update(double deltaTime) {
+        updateCameraVectors();
+        float scale = this.movementSpeed * (float) deltaTime;
         this.position.fma(scale, this.trajectory);
     }
 
-    public Matrix4f get_view_matrix() {
-        return view_matrix
+    public Matrix4f getViewMatrix() {
+        return viewMatrix
                 .identity()
                 .lookAlong(this.front, this.up)
                 .translate(-this.position.x, -this.position.y, -this.position.z);
     }
 
-    public Matrix4f get_perspective_matrix() {
-        return proj_matrix
+    public Matrix4f getPerspectiveMatrix() {
+        return projMatrix
                 .identity()
                 .perspective(this.frustrum.fov, this.frustrum.aspect, this.frustrum.near, this.frustrum.far);
     }
 
     public void process_keyboard() {
-        this.input_vector.zero();
-        this.movement_speed = SPEED;
+        this.inputVector.zero();
+        this.movementSpeed = SPEED;
 
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS) {
-            this.input_vector.z = 1;
+            this.inputVector.z = 1;
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_A) == GLFW.GLFW_PRESS) {
-            this.input_vector.x = -1;
+            this.inputVector.x = -1;
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_S) == GLFW.GLFW_PRESS) {
-            this.input_vector.z = -1;
+            this.inputVector.z = -1;
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS) {
-            this.input_vector.x = 1;
+            this.inputVector.x = 1;
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_Q) == GLFW.GLFW_PRESS) {
-            this.input_vector.y = -1;
+            this.inputVector.y = -1;
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_E) == GLFW.GLFW_PRESS) {
-            this.input_vector.y = 1;
+            this.inputVector.y = 1;
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS) {
-            this.movement_speed = SPEED * 4;
+            this.movementSpeed = SPEED * 4;
         }
 
-        if (this.input_vector.x != 0 || this.input_vector.y != 0 || this.input_vector.z != 0) {
-            this.input_vector.normalize();
+        if (this.inputVector.x != 0 || this.inputVector.y != 0 || this.inputVector.z != 0) {
+            this.inputVector.normalize();
         }
     }
 
     public void process_mouse_movement(double offset_x, double offset_y, double delta_time) {
-        offset_x *= this.mouse_sensitivity * delta_time;
-        offset_y *= this.mouse_sensitivity * delta_time;
+        offset_x *= this.mouseSensitivity * delta_time;
+        offset_y *= this.mouseSensitivity * delta_time;
 
         this.yaw   += (float) offset_x;
         this.pitch += (float) offset_y;
@@ -166,7 +166,7 @@ public class Camera extends Entity {
         }
     }
 
-    public void update_camera_vectors() {
+    public void updateCameraVectors() {
         float yaw_rad   = (float) Math.toRadians(this.yaw);
         float pitch_rad = (float) Math.toRadians(this.pitch);
         float cos_pitch = (float) Math.cos(pitch_rad);
@@ -179,20 +179,20 @@ public class Camera extends Entity {
             ).normalize();
         }
 
-        this.front.cross(this.world_up, this.right).normalize();
+        this.front.cross(this.worldUp, this.right).normalize();
         this.right.cross(this.front, this.up).normalize();
 
         this.trajectory.zero();
-        this.trajectory.fma(input_vector.x, right)
-                .fma(input_vector.y, up)
-                .fma(input_vector.z, front);
+        this.trajectory.fma(inputVector.x, right)
+                .fma(inputVector.y, up)
+                .fma(inputVector.z, front);
     }
 
-    public void look_at(Vector3f target_position) {
-        Vector3f cam_position = new Vector3f(this.position);
-        Vector3f direction = target_position.sub(cam_position).normalize();
+    public void lookAt(Vector3f targetPosition) {
+        Vector3f camPosition = new Vector3f(this.position);
+        Vector3f direction = targetPosition.sub(camPosition).normalize();
         this.front.set(direction);
-        update_camera_vectors();
+        updateCameraVectors();
     }
 
 }

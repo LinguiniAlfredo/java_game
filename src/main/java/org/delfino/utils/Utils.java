@@ -1,15 +1,13 @@
 package org.delfino.utils;
 
-import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.system.MemoryStack;
 
 public class Utils {
 
@@ -18,7 +16,7 @@ public class Utils {
         for (Vertex v : vertices) {
             fb.put(v.position.x).put(v.position.y).put(v.position.z);
             fb.put(v.normal.x).put(v.normal.y).put(v.normal.z);
-            fb.put(v.tex_coords.x).put(v.tex_coords.y);
+            fb.put(v.texCoords.x).put(v.texCoords.y);
         }
         fb.flip();
         return fb;
@@ -33,7 +31,7 @@ public class Utils {
         return fb;
     }
 
-    public static FloatBuffer vertices_3f_to_fb(ArrayList<Vector3f> vertices) {
+    public static FloatBuffer vertices3FToFb(ArrayList<Vector3f> vertices) {
         FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.size() * 3);
         for (Vector3f v : vertices) {
             fb.put(v.x).put(v.y).put(v.z);
@@ -42,7 +40,7 @@ public class Utils {
         return fb;
     }
 
-    public static FloatBuffer float_arr_to_fb(float[] vertices) {
+    public static FloatBuffer floatArrToFb(float[] vertices) {
         FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.length);
         for (float v : vertices) {
             fb.put(v);
@@ -70,7 +68,7 @@ public class Utils {
         }
     }
 
-    public static FloatBuffer append_float_buffers(FloatBuffer buf1, FloatBuffer buf2) {
+    public static FloatBuffer appendFloatBuffer(FloatBuffer buf1, FloatBuffer buf2) {
         FloatBuffer result = BufferUtils.createFloatBuffer(buf1.limit() + buf2.limit());
         result.put(buf1);
         result.put(buf2);

@@ -15,59 +15,59 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class UI {
 
-    public int                 crosshair_VAO, crosshair_VBO;
-    public Shader              shader;
-    public ArrayList<Vector2f> crosshair_vertices;
-    public FloatBuffer         crosshair_vertex_buffer;
-    public Matrix4f            model = new Matrix4f(), view = new Matrix4f(), proj = new Matrix4f();
+    public int crosshairVAO, crosshairVBO;
+    public Shader shader;
+    public ArrayList<Vector2f> crosshairVertices;
+    public FloatBuffer crosshairVertexbuffer;
+    public Matrix4f model = new Matrix4f(), view = new Matrix4f(), proj = new Matrix4f();
 
     public UI() {
-        this.shader                  = new Shader("shaders/simple_ui.vert", "shaders/simple_ui.frag");
-        this.crosshair_vertices      = generate_crosshair_vertices();
-        this.crosshair_vertex_buffer = Utils.vertices_2f_to_fb(this.crosshair_vertices);
+        this.shader = new Shader("shaders/simple_ui.vert", "shaders/simple_ui.frag");
+        this.crosshairVertices = generateCrosshairVertices();
+        this.crosshairVertexbuffer = Utils.vertices_2f_to_fb(this.crosshairVertices);
         init();
     }
 
     public void delete() {
         this.shader.delete();
-        glDeleteVertexArrays(this.crosshair_VAO);
-        glDeleteBuffers(this.crosshair_VBO);
+        glDeleteVertexArrays(this.crosshairVAO);
+        glDeleteBuffers(this.crosshairVBO);
     }
 
     public void render() {
         if (Context.gamemode == Gamemode.PAUSED) {
-            render_pause_menu();
+            renderPauseMenu();
         } else if (Context.gamemode == Gamemode.GAME){
-            if (Context.active_camera instanceof FPSCamera) {
-                render_crosshair();
+            if (Context.activeCamera instanceof FPSCamera) {
+                renderCrosshair();
             }
         }
     }
 
-    private void render_pause_menu() {
+    private void renderPauseMenu() {
 
     }
 
-    private void render_crosshair() {
+    private void renderCrosshair() {
         model.identity();
         view.identity();
         proj.identity();
-        proj.ortho(0.f, (float)Context.screen_width, 0.f, (float)Context.screen_height, -1.f, 1.f);
+        proj.ortho(0.f, (float)Context.screenWidth, 0.f, (float)Context.screenHeight, -1.f, 1.f);
 
         this.shader.use();
-        this.shader.set_mat4("model", model);
-        this.shader.set_mat4("view", view);
-        this.shader.set_mat4("projection", proj);
+        this.shader.setMat4("model", model);
+        this.shader.setMat4("view", view);
+        this.shader.setMat4("projection", proj);
 
-        glBindVertexArray(this.crosshair_VAO);
-        glDrawArrays(GL_LINES, 0, this.crosshair_vertices.size());
+        glBindVertexArray(this.crosshairVAO);
+        glDrawArrays(GL_LINES, 0, this.crosshairVertices.size());
         glBindVertexArray(0);
     }
 
-    private ArrayList<Vector2f> generate_crosshair_vertices() {
+    private ArrayList<Vector2f> generateCrosshairVertices() {
         ArrayList<Vector2f> vertices = new ArrayList<>();
-        float center_x    = Context.screen_width * 0.5f;
-        float center_y    = Context.screen_height * 0.5f;
+        float center_x    = Context.screenWidth * 0.5f;
+        float center_y    = Context.screenHeight * 0.5f;
         float line_size   = 6.f;
         float center_size = 4.f;
 
@@ -84,13 +84,13 @@ public class UI {
     }
 
     private void init() {
-        this.crosshair_VAO = glGenVertexArrays();
-        this.crosshair_VBO = glGenBuffers();
+        this.crosshairVAO = glGenVertexArrays();
+        this.crosshairVBO = glGenBuffers();
 
-        glBindVertexArray(this.crosshair_VAO);
+        glBindVertexArray(this.crosshairVAO);
 
-        glBindBuffer(GL_ARRAY_BUFFER, this.crosshair_VBO);
-        glBufferData(GL_ARRAY_BUFFER, this.crosshair_vertex_buffer, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, this.crosshairVBO);
+        glBufferData(GL_ARRAY_BUFFER, this.crosshairVertexbuffer, GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 2, GL_FLOAT, false, Float.BYTES * 2, 0);
         glEnableVertexAttribArray(0);

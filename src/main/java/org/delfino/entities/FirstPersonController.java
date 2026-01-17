@@ -25,8 +25,8 @@ public class FirstPersonController extends Entity {
     public float depth  = 2.f;
     public Vector3f gravity = new Vector3f(0.f, -9.8f, 0.f);
     public Vector3f velocity = new Vector3f();
-    private ArrayList<Vector3f> collision_vectors = new ArrayList<>();
-    private ArrayList<Vector3f> collision_normals = new ArrayList<>();
+    private ArrayList<Vector3f> collisionVectors = new ArrayList<>();
+    private ArrayList<Vector3f> collisionNormals = new ArrayList<>();
     private Vector3f tmp = new Vector3f();
     public float movement_speed = 10.0f;
     public Vector3f trajectory = new Vector3f();
@@ -41,8 +41,8 @@ public class FirstPersonController extends Entity {
             new Vector3f(1.f, 1.f, 1.f),
             ""
         );
-        this.camera = new FPSCamera(Context.current_scene, this, position, new Vector3f(0.f, 0.f, 1.f));
-        Context.active_camera = this.camera;
+        this.camera = new FPSCamera(Context.currentScene, this, position, new Vector3f(0.f, 0.f, 1.f));
+        Context.activeCamera = this.camera;
 
         this.collision = new Collision(position, width, height, depth);
     }
@@ -50,7 +50,7 @@ public class FirstPersonController extends Entity {
     public FirstPersonController(Scene scene, Vector3f position, Quaternionf rotation, Vector3f scale) {
         super(scene, FIRST_PERSON_CONTROLLER, "", position, rotation, scale, "");
         this.camera = new FPSCamera(scene, this, position, new Vector3f(0.f, 0.f, 1.f));
-        Context.active_camera = this.camera;
+        Context.activeCamera = this.camera;
 
         this.collision = new Collision(position, width, height, depth);
     }
@@ -62,7 +62,7 @@ public class FirstPersonController extends Entity {
         this.position.fma(scale, this.trajectory);
 
         this.velocity.zero();
-        this.collision_vectors.clear();
+        this.collisionVectors.clear();
         boolean colliding = false;
 
         tmp.set(this.gravity);
@@ -71,7 +71,7 @@ public class FirstPersonController extends Entity {
         if (this.state == PlayerState.AIRBORNE) {
             this.collision.position.add(this.velocity);
         }
-        colliding = check_for_ground();
+        colliding = checkForGround();
 
         if (colliding) {
             this.collision.position.set(this.position);
@@ -81,21 +81,21 @@ public class FirstPersonController extends Entity {
     }
 
     @Override
-    public void render_collider() {
+    public void renderCollider() {
         this.collision.render();
     }
 
-    private boolean check_for_ground() {
-        this.collision_normals.clear();
-        for (Entity entity : Context.current_scene.entities) {
+    private boolean checkForGround() {
+        this.collisionNormals.clear();
+        for (Entity entity : Context.currentScene.entities) {
             if (entity.position.y < this.position.y && this.collision.intersects(entity.collision)){
                 this.state = PlayerState.GROUNDED;
-                this.collision_normals.add(entity.collision.normal);
+                this.collisionNormals.add(entity.collision.normal);
             }
         }
-        if (collision_normals.isEmpty()) {
+        if (collisionNormals.isEmpty()) {
             this.state = PlayerState.AIRBORNE;
         }
-        return !this.collision_normals.isEmpty();
+        return !this.collisionNormals.isEmpty();
     }
 }

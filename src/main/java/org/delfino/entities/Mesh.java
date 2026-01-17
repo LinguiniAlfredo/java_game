@@ -18,48 +18,48 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 public class Mesh {
-    int                VAO, VBO, EBO;
-    ArrayList<Vertex>  vertices;
-    FloatBuffer        vertex_buffer;
-    IntBuffer          indices;
+    int VAO, VBO, EBO;
+    ArrayList<Vertex> vertices;
+    FloatBuffer vertexBuffer;
+    IntBuffer indices;
     ArrayList<Texture> textures;
-    Matrix4f           mat_model = new Matrix4f();
+    Matrix4f matModel = new Matrix4f();
 
     public Mesh(ArrayList<Vertex> vertices, ArrayList<Integer> indices, ArrayList<Texture> textures) {
-        this.vertices      = vertices;
-        this.vertex_buffer = Utils.vertices_to_fb(this.vertices);
-        this.indices       = Utils.indices_to_ib(indices);
-        this.textures      = textures;
+        this.vertices = vertices;
+        this.vertexBuffer = Utils.vertices_to_fb(this.vertices);
+        this.indices = Utils.indices_to_ib(indices);
+        this.textures = textures;
 
         init();
     }
 
     public void render(Camera camera, Shader shader, Vector3f position, Quaternionf orientation, Vector3f scale, boolean selected) {
         shader.use();
-        shader.set_int("shadow_map", 0);
-        shader.set_int("texture1", 1);
-        shader.set_vec3("camera_pos", camera.position);
-        shader.set_vec3("light_pos", Context.current_scene.light_cube.position);
-        shader.set_mat4("light_space_matrix", Context.current_scene.shadow_map.light_space_matrix);
-        shader.set_int("selected", selected ? 1 : 0);
+        shader.setInt("shadow_map", 0);
+        shader.setInt("texture1", 1);
+        shader.setVec3("camera_pos", camera.position);
+        shader.setVec3("light_pos", Context.currentScene.lightCube.position);
+        shader.setMat4("light_space_matrix", Context.currentScene.shadowMap.lightSpaceMatrix);
+        shader.setInt("selected", selected ? 1 : 0);
 
-        mat_model.identity().scale(scale).translate(position).rotate(orientation);
-        Matrix4f mat_view = camera.get_view_matrix();
-        Matrix4f mat_proj = camera.get_perspective_matrix();
+        matModel.identity().scale(scale).translate(position).rotate(orientation);
+        Matrix4f matView = camera.getViewMatrix();
+        Matrix4f matProj = camera.getPerspectiveMatrix();
 
-        shader.set_mat4("model", mat_model);
-        shader.set_mat4("view", mat_view);
-        shader.set_mat4("projection", mat_proj);
+        shader.setMat4("model", matModel);
+        shader.setMat4("view", matView);
+        shader.setMat4("projection", matProj);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, Context.current_scene.shadow_map.depth_map);
+        glBindTexture(GL_TEXTURE_2D, Context.currentScene.shadowMap.depthMap);
 
         if (!this.textures.isEmpty()) {
-            shader.set_int("has_texture", GL_TRUE);
+            shader.setInt("has_texture", GL_TRUE);
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, this.textures.get(0).id);
         } else {
-            shader.set_int("has_texture", GL_FALSE);
+            shader.setInt("has_texture", GL_FALSE);
         }
 
         glBindVertexArray(this.VAO);
@@ -67,10 +67,10 @@ public class Mesh {
         glBindVertexArray(0);
     }
 
-    public void render_shadow_map(Shader shadow_map_shader, Vector3f position, Quaternionf orientation, Vector3f scale) {
-        mat_model.identity().scale(scale).translate(position).rotate(orientation);
+    public void renderShadowMap(Shader shadowMapShader, Vector3f position, Quaternionf orientation, Vector3f scale) {
+        matModel.identity().scale(scale).translate(position).rotate(orientation);
 
-        shadow_map_shader.set_mat4("model", mat_model);
+        shadowMapShader.setMat4("model", matModel);
 
         glBindVertexArray(this.VAO);
         glDrawElements(GL_TRIANGLES, this.indices.remaining(), GL_UNSIGNED_INT, 0);
@@ -85,7 +85,7 @@ public class Mesh {
         glBindVertexArray(this.VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, this.VBO);
-        glBufferData(GL_ARRAY_BUFFER, this.vertex_buffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, this.vertexBuffer, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this.EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, this.indices, GL_STATIC_DRAW);

@@ -28,9 +28,9 @@ public class StaticCamera extends Camera {
 
     @Override
     public void update(double deltaTime) {
-        update_camera_vectors();
-        if (Context.current_scene.player.collision.intersects(this.collision)) {
-            Context.active_camera = this;
+        updateCameraVectors();
+        if (Context.currentScene.player.collision.intersects(this.collision)) {
+            Context.activeCamera = this;
         }
     }
 
@@ -45,25 +45,25 @@ public class StaticCamera extends Camera {
     }
 
     @Override
-    public void update_camera_vectors() {
+    public void updateCameraVectors() {
         this.front.rotate(this.orientation);
-        this.front.cross(this.world_up, this.right).normalize();
+        this.front.cross(this.worldUp, this.right).normalize();
         this.right.cross(this.front, this.up).normalize();
     }
 
     public void render_viewport() {
-        int width = Context.screen_width / 4;
-        int height = Context.screen_height / 4;
-        int pos_x = Context.screen_width - width;
+        int width = Context.screenWidth / 4;
+        int height = Context.screenHeight / 4;
+        int pos_x = Context.screenWidth - width;
 
         glClear(GL_DEPTH_BUFFER_BIT);
         glViewport(pos_x, 0, width, height);
 
-        for (Entity entity : Context.current_scene.entities) {
+        for (Entity entity : Context.currentScene.entities) {
             entity.render(this);
         }
-        Context.current_scene.skybox.render(this);
+        Context.currentScene.skybox.render(this);
 
-        glViewport(0, 0, Context.screen_width, Context.screen_height);
+        glViewport(0, 0, Context.screenWidth, Context.screenHeight);
     }
 }

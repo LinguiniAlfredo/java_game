@@ -17,20 +17,20 @@ enum Axis {
 public class Gizmo {
 
     public int         VAO, VBO;
-    public FloatBuffer vertex_buffer;
+    public FloatBuffer vertexBuffer;
     public Vector3f    position;
-    public int         num_vertices;
-    public Axis        selected_axis;
-    public Axis        hovered_axis;
-    public Collision   x_axis_volume;
-    public Collision   y_axis_volume;
-    public Collision   z_axis_volume;
+    public int numVertices;
+    public Axis selectedAxis;
+    public Axis hoveredAxis;
+    public Collision xAxisVolume;
+    public Collision yAxisVolume;
+    public Collision zAxisVolume;
     public Shader      shader;
     public Editor      editor;
-    public float       line_length = 2.f;
-    public float       line_width  = 3.f;
-    public int         circle_resolution = 100;
-    public float       circle_radius   = 2.f;
+    public float lineLength = 2.f;
+    public float lineWidth = 3.f;
+    public int circleResolution = 100;
+    public float circleRadius = 2.f;
 
 
     public Gizmo(Editor editor, Vector3f position) {
@@ -39,7 +39,7 @@ public class Gizmo {
         this.shader   = new Shader("shaders/gizmo.vert", "shaders/gizmo.frag");
 
         create_collisions();
-        create_vertices();
+        createVertices();
         init();
     }
 
@@ -48,9 +48,9 @@ public class Gizmo {
         glDeleteBuffers(this.VBO);
         this.shader.delete();
 
-        if (this.x_axis_volume != null) this.x_axis_volume.delete();
-        if (this.y_axis_volume != null) this.y_axis_volume.delete();
-        if (this.z_axis_volume != null) this.z_axis_volume.delete();
+        if (this.xAxisVolume != null) this.xAxisVolume.delete();
+        if (this.yAxisVolume != null) this.yAxisVolume.delete();
+        if (this.zAxisVolume != null) this.zAxisVolume.delete();
     }
 
     public void render() {
@@ -62,32 +62,32 @@ public class Gizmo {
     }
 
     public void render_collisions() {
-        this.x_axis_volume.render();
-        this.y_axis_volume.render();
-        this.z_axis_volume.render();
+        this.xAxisVolume.render();
+        this.yAxisVolume.render();
+        this.zAxisVolume.render();
     }
 
     public void check_hovered(Vector3f ray) {
-        if (this.selected_axis == null) {
-            if (this.x_axis_volume.intersects(ray)) {
-                this.hovered_axis = Axis.X;
-            } else if (this.y_axis_volume.intersects(ray)) {
-                this.hovered_axis = Axis.Y;
-            } else if (this.z_axis_volume.intersects(ray)) {
-                this.hovered_axis = Axis.Z;
+        if (this.selectedAxis == null) {
+            if (this.xAxisVolume.intersects(ray)) {
+                this.hoveredAxis = Axis.X;
+            } else if (this.yAxisVolume.intersects(ray)) {
+                this.hoveredAxis = Axis.Y;
+            } else if (this.zAxisVolume.intersects(ray)) {
+                this.hoveredAxis = Axis.Z;
             } else {
-                this.hovered_axis = null;
+                this.hoveredAxis = null;
             }
         }
     }
 
     public void translate_collision(Vector3f position) {
-        this.x_axis_volume.position.add(position);
-        this.y_axis_volume.position.add(position);
-        this.z_axis_volume.position.add(position);
+        this.xAxisVolume.position.add(position);
+        this.yAxisVolume.position.add(position);
+        this.zAxisVolume.position.add(position);
     }
 
-    public void create_vertices() {
+    public void createVertices() {
         // To be overridden in implementations
     }
 
@@ -103,7 +103,7 @@ public class Gizmo {
         glBindVertexArray(this.VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, this.VBO);
-        glBufferData(GL_ARRAY_BUFFER, this.vertex_buffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, this.vertexBuffer, GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, false, Float.BYTES * 6, 0);
         glVertexAttribPointer(1, 3, GL_FLOAT, false, Float.BYTES * 6, Float.BYTES * 3);

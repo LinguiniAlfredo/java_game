@@ -19,37 +19,37 @@ public class Compass extends Gizmo {
     @Override
     public void render() {
         glViewport(50, 50, 100, 100);
-        Matrix4f mat_model = new Matrix4f();
-        Matrix4f mat_view  = new Matrix4f()
+        Matrix4f matModel = new Matrix4f();
+        Matrix4f matView  = new Matrix4f()
                 .identity()
-                .lookAt(Context.active_camera.front, new Vector3f(0.f, 0.f, 0.f), Context.active_camera.up);
-        Matrix4f mat_proj  = new Matrix4f().ortho(-1.f, 1.f, -1.f, 1.f, 1.f, 1000.f);
+                .lookAt(Context.activeCamera.front, new Vector3f(0.f, 0.f, 0.f), Context.activeCamera.up);
+        Matrix4f matProj  = new Matrix4f().ortho(-1.f, 1.f, -1.f, 1.f, 1.f, 1000.f);
 
         this.shader.use();
-        this.shader.set_mat4("model", mat_model);
-        this.shader.set_mat4("view", mat_view);
-        this.shader.set_mat4("projection", mat_proj);
+        this.shader.setMat4("model", matModel);
+        this.shader.setMat4("view", matView);
+        this.shader.setMat4("projection", matProj);
 
-        this.shader.set_int("hovered", 1);
+        this.shader.setInt("hovered", 1);
         glBindVertexArray(this.VAO);
         glDrawArrays(GL_LINES, 0, 6);
         glBindVertexArray(0);
 
-        glViewport(0, 0, Context.screen_width, Context.screen_height);
+        glViewport(0, 0, Context.screenWidth, Context.screenHeight);
     }
 
     @Override
-    public void create_vertices() {
+    public void createVertices() {
         ArrayList<Vector3f> vertices = new ArrayList<>();
-        add_line_vertices(vertices, Axis.X);
-        add_line_vertices(vertices, Axis.Y);
-        add_line_vertices(vertices, Axis.Z);
+        addLineVertices(vertices, Axis.X);
+        addLineVertices(vertices, Axis.Y);
+        addLineVertices(vertices, Axis.Z);
 
-        this.vertex_buffer = Utils.vertices_3f_to_fb(vertices);
-        add_cube_vertices();
+        this.vertexBuffer = Utils.vertices3FToFb(vertices);
+        addCubeVertices();
     }
 
-    private void add_line_vertices(ArrayList<Vector3f> vertices, Axis axis) {
+    private void addLineVertices(ArrayList<Vector3f> vertices, Axis axis) {
         Vector3f zero = new Vector3f(0.f);
         Vector3f vertex = new Vector3f(0.f);
         Vector3f red    = new Vector3f(1.f, 0.f, 0.f);
@@ -60,26 +60,26 @@ public class Compass extends Gizmo {
         switch (axis) {
             case X:
                 vertices.add(red);
-                vertex.x = line_length;
+                vertex.x = lineLength;
                 vertices.add(vertex);
                 vertices.add(red);
                 break;
             case Y:
                 vertices.add(green);
-                vertex.y = line_length;
+                vertex.y = lineLength;
                 vertices.add(vertex);
                 vertices.add(green);
                 break;
             case Z:
                 vertices.add(blue);
-                vertex.z = line_length;
+                vertex.z = lineLength;
                 vertices.add(vertex);
                 vertices.add(blue);
                 break;
         }
     }
 
-    private void add_cube_vertices() {
+    private void addCubeVertices() {
         float[] vertices = new float[]{
                 -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
                  0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
@@ -111,7 +111,7 @@ public class Compass extends Gizmo {
                  0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
                 -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f
         };
-        FloatBuffer cube_buffer = Utils.float_arr_to_fb(vertices);
-        this.vertex_buffer = Utils.append_float_buffers(this.vertex_buffer, cube_buffer);
+        FloatBuffer cubeBuffer = Utils.floatArrToFb(vertices);
+        this.vertexBuffer = Utils.appendFloatBuffer(this.vertexBuffer, cubeBuffer);
     }
 }

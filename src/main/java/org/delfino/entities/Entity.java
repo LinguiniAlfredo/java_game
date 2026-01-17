@@ -1,10 +1,7 @@
 package org.delfino.entities;
 
-import org.apache.commons.io.FilenameUtils;
 import org.delfino.Context;
-import org.delfino.Gamemode;
 import org.delfino.cameras.Camera;
-import org.delfino.cameras.StaticCamera;
 import org.delfino.scenes.Scene;
 import org.delfino.utils.Collision;
 import org.delfino.utils.Shader;
@@ -13,17 +10,14 @@ import org.delfino.utils.Vertex;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 public class Entity {
     public Model       model;
     public Shader      shader;
     public Collision   collision;
     public Vector3f    position;
-    public Vector3f    target_position;
+    public Vector3f    targetPosition;
     public Quaternionf orientation;
-    public Quaternionf target_orientation;
+    public Quaternionf targetOrientation;
     public Vector3f    scale;
     public boolean     selected = false;
     public String      name;
@@ -40,23 +34,23 @@ public class Entity {
     public Entity(Scene scene, EntityType type, Vector3f position) {
         this.scene = scene;
         this.type  = type;
-        this.name  = get_entity_name();
+        this.name  = getEntityName();
         this.position = position;
     }
 
     public Entity(Scene scene, EntityType type, String filename, Vector3f position, Quaternionf orientation, Vector3f scale, String texture) {
         this.scene              = scene;
         this.type               = type;
-        this.name               = get_entity_name();
+        this.name               = getEntityName();
         this.position           = position;
-        this.target_position    = position;
+        this.targetPosition     = position;
         this.orientation        = orientation;
-        this.target_orientation = orientation;
+        this.targetOrientation  = orientation;
         this.scale              = scale;
         this.model              = new Model(filename, texture);
         this.shader             = new Shader("shaders/lighting.vert", "shaders/lighting.frag");
 
-        Vector3f dimensions = get_dimensions();
+        Vector3f dimensions = getDimensions();
         this.collision      = new Collision(position, dimensions.x, dimensions.y, dimensions.z);
     }
 
@@ -72,7 +66,7 @@ public class Entity {
 
     public void render() {
         if (this.model != null) {
-            this.model.render(Context.active_camera, this.shader, this.position, this.orientation, this.scale, this.selected);
+            this.model.render(Context.activeCamera, this.shader, this.position, this.orientation, this.scale, this.selected);
         }
     }
     public void render(Camera cam) {
@@ -81,20 +75,20 @@ public class Entity {
         }
     }
 
-    public void render_collider() {
+    public void renderCollider() {
         if (this.collision != null) {
             this.collision.render();
         }
     }
 
-    public void render_shadow_map(Shader shadow_map_shader) {
+    public void renderShadowMap(Shader shadowMapShader) {
         if (this.model != null) {
-            this.model.render_shadow_map(shadow_map_shader, this.position, this.orientation, this.scale);
+            this.model.renderShadowMap(shadowMapShader, this.position, this.orientation, this.scale);
         }
     }
 
 
-    private Vector3f get_dimensions() {
+    private Vector3f getDimensions() {
         float min_x = 0.f, max_x = 0.f;
         float min_y = 0.f, max_y = 0.f;
         float min_z = 0.f, max_z = 0.f;
@@ -126,7 +120,7 @@ public class Entity {
         return new Vector3f(max_x - min_x, max_y - min_y, max_z - min_z);
     }
 
-    private String get_entity_name() {
+    private String getEntityName() {
         String     name = this.type.toString();
         EntityType type = EntityType.valueOf(name.toUpperCase());
 

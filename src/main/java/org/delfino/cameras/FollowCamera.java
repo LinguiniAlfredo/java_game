@@ -12,7 +12,7 @@ public class FollowCamera extends Camera {
     }
 
     @Override
-    public void update_camera_vectors() {
+    public void updateCameraVectors() {
         float yaw_rad   = (float) Math.toRadians(this.yaw);
         float pitch_rad = (float) Math.toRadians(this.pitch);
         float cos_pitch = (float) Math.cos(pitch_rad);
@@ -25,7 +25,7 @@ public class FollowCamera extends Camera {
 //            ).normalize();
 //        }
 
-        this.front.cross(this.world_up, this.right).normalize();
+        this.front.cross(this.worldUp, this.right).normalize();
         this.right.cross(this.front, this.up).normalize();
     }
 }

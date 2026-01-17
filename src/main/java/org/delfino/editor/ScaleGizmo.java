@@ -27,15 +27,15 @@ public class ScaleGizmo extends Gizmo {
 
     @Override
     public void transform_object(Entity object, double offset_x, double offset_y, double delta_time) {
-        if (this.selected_axis != null) {
-            offset_x *= this.editor.camera.mouse_sensitivity * delta_time;
-            offset_y *= this.editor.camera.mouse_sensitivity * delta_time;
+        if (this.selectedAxis != null) {
+            offset_x *= this.editor.camera.mouseSensitivity * delta_time;
+            offset_y *= this.editor.camera.mouseSensitivity * delta_time;
             Vector3f mouse_vector_view = new Vector3f().fma((float) offset_x, this.editor.camera.right)
                     .fma((float) offset_y, this.editor.camera.up)
                     .fma(0.f, this.editor.camera.front);
             Vector3f transformation_vector = new Vector3f();
 
-            switch(this.selected_axis) {
+            switch(this.selectedAxis) {
                 case X:
                     transformation_vector.x = mouse_vector_view.x / 2;
                     object.scale.x = transformation_vector.x;
@@ -56,23 +56,23 @@ public class ScaleGizmo extends Gizmo {
     @Override
     public void render() {
         Matrix4f mat_model = new Matrix4f().translate(this.position);
-        Matrix4f mat_view  = Context.active_camera.get_view_matrix();
-        Matrix4f mat_proj  = Context.active_camera.get_perspective_matrix();
+        Matrix4f mat_view  = Context.activeCamera.getViewMatrix();
+        Matrix4f mat_proj  = Context.activeCamera.getPerspectiveMatrix();
 
         this.shader.use();
-        this.shader.set_mat4("model", mat_model);
-        this.shader.set_mat4("view", mat_view);
-        this.shader.set_mat4("projection", mat_proj);
+        this.shader.setMat4("model", mat_model);
+        this.shader.setMat4("view", mat_view);
+        this.shader.setMat4("projection", mat_proj);
 
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        glLineWidth(this.line_width);
+        glLineWidth(this.lineWidth);
         glBindVertexArray(this.VAO);
-        this.shader.set_int("hovered", this.hovered_axis == Axis.X || this.selected_axis == Axis.X ? 1 : 0);
+        this.shader.setInt("hovered", this.hoveredAxis == Axis.X || this.selectedAxis == Axis.X ? 1 : 0);
         glDrawArrays(GL_LINES, 0, 2);
-        this.shader.set_int("hovered", this.hovered_axis == Axis.Y || this.selected_axis == Axis.Y ? 1 : 0);
+        this.shader.setInt("hovered", this.hoveredAxis == Axis.Y || this.selectedAxis == Axis.Y ? 1 : 0);
         glDrawArrays(GL_LINES, 2, 2);
-        this.shader.set_int("hovered", this.hovered_axis == Axis.Z || this.selected_axis == Axis.Z ? 1 : 0);
+        this.shader.setInt("hovered", this.hoveredAxis == Axis.Z || this.selectedAxis == Axis.Z ? 1 : 0);
         glDrawArrays(GL_LINES, 4, 2);
         glBindVertexArray(0);
 
@@ -81,30 +81,30 @@ public class ScaleGizmo extends Gizmo {
 
     @Override
     public void create_collisions() {
-        this.x_axis_volume = new Collision(
-                new Vector3f(position).add(new Vector3f(line_length / 2, 0.f, 0.f)),
-                line_length, 0.2f,
+        this.xAxisVolume = new Collision(
+                new Vector3f(position).add(new Vector3f(lineLength / 2, 0.f, 0.f)),
+                lineLength, 0.2f,
                 0.2f);
-        this.y_axis_volume = new Collision(
-                new Vector3f(position).add(new Vector3f(0.f, line_length / 2, 0.f)),
-                0.2f, line_length,
+        this.yAxisVolume = new Collision(
+                new Vector3f(position).add(new Vector3f(0.f, lineLength / 2, 0.f)),
+                0.2f, lineLength,
                 0.2f);
-        this.z_axis_volume = new Collision(
-                new Vector3f(position).add(new Vector3f(0.f, 0.f, line_length / 2)),
+        this.zAxisVolume = new Collision(
+                new Vector3f(position).add(new Vector3f(0.f, 0.f, lineLength / 2)),
                 0.2f, 0.2f,
-                line_length);
+                lineLength);
 
     }
 
     @Override
-    public void create_vertices() {
+    public void createVertices() {
         ArrayList<Vector3f> vertices = new ArrayList<>();
         add_line_vertices(vertices, Axis.X);
         add_line_vertices(vertices, Axis.Y);
         add_line_vertices(vertices, Axis.Z);
 
-        this.num_vertices = vertices.size();
-        this.vertex_buffer = Utils.vertices_3f_to_fb(vertices);
+        this.numVertices = vertices.size();
+        this.vertexBuffer = Utils.vertices3FToFb(vertices);
     }
 
     private void add_line_vertices(ArrayList<Vector3f> vertices, Axis axis) {
@@ -118,19 +118,19 @@ public class ScaleGizmo extends Gizmo {
         switch (axis) {
             case X:
                 vertices.add(red);
-                vertex.x = line_length;
+                vertex.x = lineLength;
                 vertices.add(vertex);
                 vertices.add(red);
                 break;
             case Y:
                 vertices.add(green);
-                vertex.y = line_length;
+                vertex.y = lineLength;
                 vertices.add(vertex);
                 vertices.add(green);
                 break;
             case Z:
                 vertices.add(blue);
-                vertex.z = line_length;
+                vertex.z = lineLength;
                 vertices.add(vertex);
                 vertices.add(blue);
                 break;

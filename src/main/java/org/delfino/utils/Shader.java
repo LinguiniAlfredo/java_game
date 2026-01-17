@@ -3,15 +3,12 @@ package org.delfino.utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.lwjgl.opengl.GL30.*;
@@ -19,11 +16,12 @@ import static org.lwjgl.opengl.GL30.*;
 public class Shader {
     int id;
 
-    public Shader(String vertex_path, String fragment_path) {
-        String vertex_code, fragment_code;
+    public Shader(String vertexPath, String fragmentPath) {
+        String vertexCode, fragmentCode;
         try {
-            vertex_code   = Files.readString(Paths.get(Shader.class.getResource("/" + vertex_path).toURI()));
-            fragment_code = Files.readString(Paths.get(Shader.class.getResource("/" + fragment_path).toURI()));
+            vertexCode   = Files.readString(Paths.get(Shader.class.getResource("/" + vertexPath).toURI()));
+            fragmentCode = Files.readString(Paths.get(Shader.class.getResource("/" + fragmentPath).toURI()));
+
         } catch (IOException | URISyntaxException e) {
             System.out.println("failed to read shader files...");
             throw new RuntimeException();
@@ -31,11 +29,11 @@ public class Shader {
 
         int v, f;
         v = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(v, vertex_code);
+        glShaderSource(v, vertexCode);
         glCompileShader(v);
 
         f = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(f, fragment_code);
+        glShaderSource(f, fragmentCode);
         glCompileShader(f);
 
         this.id = glCreateProgram();
@@ -69,7 +67,7 @@ public class Shader {
         glUseProgram(this.id);
     }
 
-    public void set_int(String name, int value) {
+    public void setInt(String name, int value) {
         glUniform1i(glGetUniformLocation(this.id, name), value);
     }
 
@@ -77,7 +75,7 @@ public class Shader {
         glUniform1f(glGetUniformLocation(this.id, name), value);
     }
 
-    public void set_vec3(String name, Vector3f value) {
+    public void setVec3(String name, Vector3f value) {
         int location = glGetUniformLocation(this.id, name);
         FloatBuffer fb;
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -99,7 +97,7 @@ public class Shader {
         }
     }
 
-    public void set_mat4(String name, Matrix4f m) {
+    public void setMat4(String name, Matrix4f m) {
         int location = glGetUniformLocation(this.id, name);
         FloatBuffer fb;
         try (MemoryStack stack = MemoryStack.stackPush()) {

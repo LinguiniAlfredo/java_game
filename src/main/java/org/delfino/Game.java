@@ -27,36 +27,36 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Game {
 
-    double[] mouse_x = new double[1];
-    double[] mouse_y = new double[1];
-    boolean  first_frame = true;
-    public double prev_mouse_x = 0;
-    public double prev_mouse_y = 0;
+    double[] mouseX = new double[1];
+    double[] mouseY = new double[1];
+    boolean firstFrame = true;
+    public double prevMouseX = 0;
+    public double prevMouseY = 0;
 
     public void run() {
-        init_context();
-        init_glfw();
+        initContext();
+        initGlfw();
 
         Context.ui = new UI();
-        Context.current_scene = new Scene("./example_level.json");
+        Context.currentScene = new Scene("./example_level.json");
 
-        game_loop();
-        close_app();
+        gameLoop();
+        closeApp();
     }
 
-    private void init_context() {
+    private void initContext() {
         Context.gamemode        = GAME;
-        Context.screen_width    = 1920;
-        Context.screen_height   = 1080;
-        Context.ticks_per_frame = 1000.f / 144.0f;
+        Context.screenWidth = 1920;
+        Context.screenHeight = 1080;
+        Context.ticksPerFrame = 1000.f / 144.0f;
         Context.wireframe       = false;
-        Context.show_shadow_map = false;
-        Context.show_collisions = false;
+        Context.showShadowMap = false;
+        Context.showCollisions = false;
     }
 //
-    private void close_app() {
+    private void closeApp() {
         Context.ui.delete();
-        Context.current_scene.delete();
+        Context.currentScene.delete();
         if (Context.editor != null) {
             Context.editor.delete();
         }
@@ -80,11 +80,11 @@ public class Game {
     }
 
     private void toggle_shadow_map() {
-        Context.show_shadow_map = !Context.show_shadow_map;
+        Context.showShadowMap = !Context.showShadowMap;
     }
 
     private void toggle_collision_render() {
-        Context.show_collisions = !Context.show_collisions;
+        Context.showCollisions = !Context.showCollisions;
     }
 
     private void toggle_paused() {
@@ -107,10 +107,10 @@ public class Game {
                 Context.editor = new Editor();
             } else {
                 Context.gamemode = GAME;
-                if (Context.current_scene != null) {
-                    Context.current_scene.delete();
+                if (Context.currentScene != null) {
+                    Context.currentScene.delete();
                 }
-                Context.current_scene = new Scene("./example_level.json");
+                Context.currentScene = new Scene("./example_level.json");
             }
         }
     }
@@ -119,37 +119,37 @@ public class Game {
         glfwPollEvents();
         if (!ImGui.getIO().getWantCaptureMouse()) {
             double x_offset, y_offset;
-            glfwGetCursorPos(Context.window, mouse_x, mouse_y);
-            if (first_frame) {
-                prev_mouse_x = mouse_x[0];
-                prev_mouse_y = mouse_y[0];
-                first_frame = false;
+            glfwGetCursorPos(Context.window, mouseX, mouseY);
+            if (firstFrame) {
+                prevMouseX = mouseX[0];
+                prevMouseY = mouseY[0];
+                firstFrame = false;
             }
-            x_offset = mouse_x[0] - prev_mouse_x;
-            y_offset = -(mouse_y[0] - prev_mouse_y);
-            prev_mouse_x = mouse_x[0];
-            prev_mouse_y = mouse_y[0];
+            x_offset = mouseX[0] - prevMouseX;
+            y_offset = -(mouseY[0] - prevMouseY);
+            prevMouseX = mouseX[0];
+            prevMouseY = mouseY[0];
 
             if (Context.gamemode != PAUSED) {
 //                Context.current_scene.player.process_mouse_movement(x_offset, y_offset, delta_time);
-                Context.active_camera.process_mouse_movement(x_offset, y_offset, delta_time);
+                Context.activeCamera.process_mouse_movement(x_offset, y_offset, delta_time);
             }
         }
         if (!ImGui.getIO().getWantCaptureKeyboard()) {
 //            Context.current_scene.player.process_keyboard();
-            Context.active_camera.process_keyboard();
+            Context.activeCamera.process_keyboard();
         }
     }
 
     private void update(double delta_time) {
-        Context.current_scene.update(delta_time);
+        Context.currentScene.update(delta_time);
     }
 
     private void render() {
         glClearColor(0.1f, 0.1f, 0.1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        Context.current_scene.render();
+        Context.currentScene.render();
         Context.ui.render();
 
         if (Context.gamemode == EDIT) {
@@ -159,7 +159,7 @@ public class Game {
         glfwSwapBuffers(Context.window);
     }
 
-    private void init_glfw() {
+    private void initGlfw() {
         // Wayland is not fully supported in GLFW
         // this will force using X11 on wayland (XWayland)
         if (SystemUtils.IS_OS_LINUX) {
@@ -177,7 +177,7 @@ public class Game {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
-        Context.window = glfwCreateWindow(Context.screen_width, Context.screen_height, "", NULL, NULL);
+        Context.window = glfwCreateWindow(Context.screenWidth, Context.screenHeight, "", NULL, NULL);
         assert Context.window != NULL;
 
         // Get the thread stack and push a new frame
@@ -209,7 +209,7 @@ public class Game {
         GL.createCapabilities();
 
         glEnable(GL_DEPTH_TEST);
-        glViewport(0, 0, Context.screen_width, Context.screen_height);
+        glViewport(0, 0, Context.screenWidth, Context.screenHeight);
 
         init_imgui();
 
@@ -219,10 +219,10 @@ public class Game {
 
     private void init_imgui() {
         ImGui.createContext();
-        Context.gui_glfw = new ImGuiImplGlfw();
-        Context.gui_gl3  = new ImGuiImplGl3();
-        Context.gui_glfw.init(Context.window, true);
-        Context.gui_gl3.init("#version 330");
+        Context.guiGlfw = new ImGuiImplGlfw();
+        Context.guiGl3 = new ImGuiImplGl3();
+        Context.guiGlfw.init(Context.window, true);
+        Context.guiGl3.init("#version 330");
     }
 
     private void set_key_callbacks() {
@@ -244,29 +244,29 @@ public class Game {
                             case GLFW_KEY_1 -> {
                                 if (Context.editor.gizmo != null) {
                                     Context.editor.gizmo.delete();
-                                    Context.editor.gizmo = new TranslateGizmo(Context.editor, Context.editor.selected_object.position);
+                                    Context.editor.gizmo = new TranslateGizmo(Context.editor, Context.editor.selectedObject.position);
                                 }
                             }
                             case GLFW_KEY_2 -> {
                                 if (Context.editor.gizmo != null) {
                                     Context.editor.gizmo.delete();
-                                    Context.editor.gizmo = new RotateGizmo(Context.editor, Context.editor.selected_object.position);
+                                    Context.editor.gizmo = new RotateGizmo(Context.editor, Context.editor.selectedObject.position);
                                 }
                             }
                             case GLFW_KEY_3 -> {
                                 if (Context.editor.gizmo != null) {
                                     Context.editor.gizmo.delete();
-                                    Context.editor.gizmo = new ScaleGizmo(Context.editor, Context.editor.selected_object.position);
+                                    Context.editor.gizmo = new ScaleGizmo(Context.editor, Context.editor.selectedObject.position);
                                 }
                             }
-                            case GLFW_KEY_F -> Context.editor.find_object();
-                            case GLFW_KEY_F12-> Context.current_scene.save_scene_to_file();
+                            case GLFW_KEY_F -> Context.editor.findObject();
+                            case GLFW_KEY_F12-> Context.currentScene.saveSceneToFile();
                             case GLFW_KEY_D -> {
                                 if ((mods & GLFW_MOD_CONTROL) != 0) {
-                                    Context.editor.duplicate_object();
+                                    Context.editor.duplicateObject();
                                 }
                             }
-                            case GLFW_KEY_DELETE -> Context.editor.delete_object();
+                            case GLFW_KEY_DELETE -> Context.editor.deleteObject();
                         }
                     }
                 }
@@ -293,10 +293,10 @@ public class Game {
                     }
                     if (action == GLFW_RELEASE) {
                         switch (button) {
-                            case GLFW_MOUSE_BUTTON_1 -> Context.editor.release_gizmo();
+                            case GLFW_MOUSE_BUTTON_1 -> Context.editor.releaseGizmo();
                             case GLFW_MOUSE_BUTTON_2 -> {
                                 Context.editor.camera.set_mode(SELECT);
-                                Context.editor.camera.input_vector.set(0);
+                                Context.editor.camera.inputVector.set(0);
                             }
                         }
                     }
@@ -317,7 +317,7 @@ public class Game {
         });
     }
 
-    private void game_loop() {
+    private void gameLoop() {
         Timer total_timer = new Timer();
         Timer fps_cap_timer = new Timer();
         double current_frame = 0;
@@ -345,9 +345,9 @@ public class Game {
             }
 
             double ticks = fps_cap_timer.get_ticks();
-            if (ticks < Context.ticks_per_frame) {
+            if (ticks < Context.ticksPerFrame) {
                 try {
-                    Thread.sleep((long) (Context.ticks_per_frame - ticks));
+                    Thread.sleep((long) (Context.ticksPerFrame - ticks));
                 } catch (InterruptedException e) {
                     System.out.println("sleep interrupted...");
                 }

@@ -10,18 +10,18 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Gridlines {
     public int         VAO, VBO;
-    public FloatBuffer vertex_buffer;
-    public float       grid_size = 1000;
+    public FloatBuffer vertexBuffer;
+    public float       gridSize = 1000;
     public Shader      shader;
 
     public Gridlines() {
-        float[] quad_vertices = {
-                -grid_size, 0, -grid_size,
-                 grid_size, 0, -grid_size,
-                 grid_size, 0,  grid_size,
-                -grid_size, 0,  grid_size
+        float[] quadVertices = {
+                -gridSize, 0, -gridSize,
+                gridSize, 0, -gridSize,
+                gridSize, 0, gridSize,
+                -gridSize, 0, gridSize
         };
-        this.vertex_buffer = Utils.float_arr_to_fb(quad_vertices);
+        this.vertexBuffer = Utils.floatArrToFb(quadVertices);
         this.shader        = new Shader("shaders/gridlines.vert", "shaders/gridlines.frag");
         init();
     }
@@ -33,13 +33,13 @@ public class Gridlines {
     }
 
     public void render() {
-        Matrix4f mat_view = Context.active_camera.get_view_matrix();
-        Matrix4f mat_proj = Context.active_camera.get_perspective_matrix();
+        Matrix4f mat_view = Context.activeCamera.getViewMatrix();
+        Matrix4f mat_proj = Context.activeCamera.getPerspectiveMatrix();
 
         this.shader.use();
         this.shader.set_float("grid_scale", 1.f);
-        this.shader.set_mat4("view", mat_view);
-        this.shader.set_mat4("projection", mat_proj);
+        this.shader.setMat4("view", mat_view);
+        this.shader.setMat4("projection", mat_proj);
 
         glBindVertexArray(this.VAO);
         glDrawArrays(GL_TRIANGLES, 0, 4);
@@ -53,7 +53,7 @@ public class Gridlines {
         glBindVertexArray(this.VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, this.VBO);
-        glBufferData(GL_ARRAY_BUFFER, this.vertex_buffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, this.vertexBuffer, GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, false, Float.BYTES * 3, 0);
         glEnableVertexAttribArray(0);
